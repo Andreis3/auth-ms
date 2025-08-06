@@ -1,0 +1,41 @@
+# Raiz do projeto onde os comandos serão executados.
+root = "."
+# Local onde a pasta temporária receberá os outputs do Air.
+tmp_dir = "tmp"
+
+[build]
+# Comando shell buildando o executável.
+# O primeiro argumento recebe onde será
+# o output do executável e o segundo argumento é
+# qual arquivo queremos transformar em binário.
+cmd = "go build -o ./tmp/customer ./cmd/main.go"
+
+# Local onde estará o executável do build (binário).
+bin = "./tmp/customer"
+
+# Array com nomes de arquivos e/ou diretórios para se ignorar.
+# Estou ignorando a pasta /tmp pois ela não faz parte do meu programa.
+exclude_dir = ["tmp", "assets", "tests", "docs", "docker"]
+
+# Array com expressões regex para ignorar arquivos com nomes específicos.
+exclude_regex = ["_test\\.go"]
+
+# Ignora arquivos que não foram alterados.
+exclude_unchanged = true
+
+# Array de extensões de arquivos para incluir no build.
+include_ext = ["go", "tpl", "tmpl", "html"]
+
+# Nome do arquivo de log que ficará dentro da pasta tmp.
+log = "build-errors.log"
+
+# Encerra o executável antigo caso ocorra algum erro no build.
+stop_on_error = false
+
+[color]
+# Cores de onde vem os logs no console.
+app = "blue"
+build = "yellow"
+main = "magenta"
+runner = "green"
+watcher = "cyan"

@@ -1,0 +1,240 @@
+services:
+  postgres-primary:
+    image: postgres:17.4
+    container_name: postgres-primary
+    restart: always
+    cap_add:
+      - SYS_TIME
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d customers-db"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: auth_main
+    volumes:
+      - primary-data:/var/lib/postgresql/data
+      - ./docker/primary/config:/config
+      - ./docker/primary/initdb:/docker-entrypoint-initdb.d
+      - primary-archive:/mnt/archive
+    entrypoint:
+      - bash
+      - -c
+      - |
+        # garante que /mnt/archive exista e seja do postgres
+        mkdir -p /mnt/archive
+        chown -R postgres:postgres /mnt/archive
+        chmod 0700 /mnt/archive
+
+        # então chama o entrypoint oficial para continuar o bootstrap
+        exec docker-entrypoint.sh postgres \
+        -c config_file=/config/postgresql.conf
+    networks:
+      - pgnet
+
+  postgres-replica1:
+    image: postgres:17.4
+    container_name: postgres-replica1
+    restart: always
+    cap_add:
+      - SYS_TIME
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d customers-db"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    depends_on:
+      - postgres-primary
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: customers-db
+      PGUSER: replicationuser # user que criamos com --replication
+      PGPASSWORD: admin
+    volumes:
+      - replica1-data:/var/lib/postgresql/data
+      - ./docker/replica1/config:/config
+    entrypoint:
+      - bash
+      - -c
+      - |
+        # 1) espera o primary responder a TCP na porta 5432
+        until pg_isready -h postgres-primary -p 5432 -U replicationuser; do
+          echo "Primary não está pronto para conexão, aguardando..."
+          sleep 1
+        done
+
+        # 2) limpa qualquer resíduo de dados antigo
+        rm -rf /var/lib/postgresql/data/*
+
+        # 3) faz o basebackup via streaming
+        until pg_basebackup \
+             -h postgres-primary \
+             -U replicationuser \
+             -D /var/lib/postgresql/data \
+             -Fp -Xs -P -R
+        do
+          echo "Executando pg_basebackup, aguardando o primary..."
+          sleep 1
+        done
+
+        # 4) por fim, delega ao entrypoint oficial que baixa privilégios e inicia o postgres
+        exec docker-entrypoint.sh postgres \
+             -c config_file=/config/postgresql.conf
+    networks:
+      - pgnet
+
+  postgres-replica2:
+    image: postgres:17.4
+    container_name: postgres-replica2
+    restart: always
+    cap_add:
+      - SYS_TIME
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    depends_on:
+      - postgres-primary
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+      PGUSER: replicationUser # user que criamos com --replication
+      PGPASSWORD: admin
+    volumes:
+      - replica2-data:/var/lib/postgresql/data
+      - ./docker/replica2/config:/config
+    entrypoint:
+      - bash
+      - -c
+      - |
+        # 1) espera o primary responder a TCP na porta 5432
+        until pg_isready -h postgres-primary -p 5432 -U replicationuser; do
+          echo "Primary não está pronto para conexão, aguardando..."
+          sleep 1
+        done
+
+        # 2) limpa qualquer resíduo de dados antigo
+        rm -rf /var/lib/postgresql/data/*
+
+        # 3) faz o basebackup via streaming
+        until pg_basebackup \
+             -h postgres-primary \
+             -U replicationuser \
+             -D /var/lib/postgresql/data \
+             -Fp -Xs -P -R
+        do
+          echo "Executando pg_basebackup, aguardando o primary..."
+          sleep 1
+        done
+
+        # 4) por fim, delega ao entrypoint oficial que baixa privilégios e inicia o postgres
+        exec docker-entrypoint.sh postgres \
+             -c config_file=/config/postgresql.conf
+    networks:
+      - pgnet
+
+  pgpool:
+    image: bitnami/pgpool:latest
+    container_name: pgpool
+    restart: always
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      postgres-replica1:
+        condition: service_healthy
+      postgres-replica2:
+        condition: service_healthy
+    ports:
+      - "5432:5432"
+    environment:
+      - PGPOOL_USER_CONF_FILE=/config/pgpool.conf
+      - PGPOOL_BACKEND_NODES=0:postgres-primary:5432:0,1:postgres-replica1:5432:2,2:postgres-replica2:5432:2
+      - PGPOOL_SR_CHECK_USER=replicationuser
+      - PGPOOL_SR_CHECK_PASSWORD=admin
+      - PGPOOL_SR_CHECK_DATABASE=postgres
+      - PGPOOL_ENABLE_LOAD_BALANCING=yes
+      - PGPOOL_POSTGRES_USERNAME=admin
+      - PGPOOL_POSTGRES_PASSWORD=admin
+
+      - PGPOOL_ADMIN_USERNAME=pooladmin
+      - PGPOOL_ADMIN_PASSWORD=pooladminpass
+    volumes:
+      - ./docker/pgpool/conf:/config
+      - ./docker/pgpool/failover.sh:/opt/bitnami/pgpool/failover.sh:ro
+    networks:
+      - pgnet
+
+  redis:
+    image: redis:6.0.9
+    container_name: redis
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --appendonly yes
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+
+  tempo:
+    image: grafana/tempo:2.4.1
+    container_name: tempo
+    ports:
+      - "3200:3200" # Grafana Tempo HTTP
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    command: ["--config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./docker/tempo/tempo.yaml:/etc/tempo.yaml
+
+  loki:
+    image: grafana/loki
+    container_name: loki
+    user: "${UID}:${GID}"
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./docker/loki/loki-config.yaml:/etc/loki/loki-config.yaml
+      - ./docker/loki/loki-data:/loki
+
+  promtail:
+    image: grafana/promtail
+    container_name: promtail
+    user: "${UID}:${GID}"
+    ports:
+      - "3101:3101"
+    volumes:
+      - ./docker/promtail/promtail-config.yaml:/etc/promtail/promtail.yaml
+
+volumes:
+  primary-data:
+  primary-archive:
+  replica1-data:
+  replica2-data:
+
+networks:
+  pgnet:
+    driver: bridge

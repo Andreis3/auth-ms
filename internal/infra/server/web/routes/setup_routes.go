@@ -34,7 +34,6 @@ func BuildRoutes(deps *RegisterRoutesDeps) []ModuleRoutes {
 	return []ModuleRoutes{
 		routes.NewHealthCheck(),
 		routes.NewMetrics(),
-		router_factory.MakeCustomerRouter(deps.PostgresDB, deps.Redis, deps.Log, deps.Prometheus, deps.Tracer, deps.Conf),
-		router_factory.MakeAuthRouter(deps.PostgresDB, deps.Log, deps.Prometheus, deps.Conf, deps.Tracer),
+		router_factory.MakeCreateAuthUserRouter(deps.PostgresDB, deps.Redis, deps.Log, deps.Prometheus, deps.Tracer, deps.Conf),
 	}
 }

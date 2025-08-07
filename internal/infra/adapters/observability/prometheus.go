@@ -11,14 +11,14 @@ import (
 )
 
 const (
-	MeterName    = "customers-ms"
+	MeterName    = "auth-ms"
 	MeterVersion = "1.0.0"
 )
 
 var (
 	exporterInstance      *prometheus.Exporter
 	meterProviderInstance *metric.MeterProvider
-	exporterOnce          sync.Once
+	singletonInstance     sync.Once
 )
 
 type Prometheus struct {
@@ -29,7 +29,7 @@ type Prometheus struct {
 }
 
 func NewPrometheus() *Prometheus {
-	exporterOnce.Do(func() {
+	singletonInstance.Do(func() {
 		exporterInstance, _ = prometheus.New()
 		meterProviderInstance = metric.NewMeterProvider(metric.WithReader(exporterInstance))
 	})
@@ -80,10 +80,11 @@ func (p *Prometheus) ObserveInstructionDBDuration(database, table, method string
 	p.histogramInstructionDuration.Record(context.Background(), duration, opt)
 }
 
-func (p *Prometheus) ObserveRequestDuration(router, protocol string, statusCode int, duration float64) {
+func (p *Prometheus) ObserveRequestDuration(router, protocol string, statusCode int, status string, duration float64) {
 	opt := api.WithAttributes(
 		attribute.Key("router").String(router),
 		attribute.Key("status_code").Int(statusCode),
+		attribute.Key("status").String(status),
 		attribute.Key("protocol").String(protocol),
 	)
 	p.histogramRequestDuration.Record(context.Background(), duration, opt)

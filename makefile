@@ -15,6 +15,9 @@ unit-verbose:
 unit-cover:
 	@go test ./tests/unit/... -coverpkg ./internal/... --tags=unit
 
+unit-cover-verbose:
+	@go test ./tests/unit/... -coverpkg ./internal/... --tags=unit -v
+
 unit-report:
 	mkdir -p "coverage" \
 	&& go test ./tests/unit/... -coverprofile=coverage/cover.out -coverpkg ./internal/... --tags=unit \

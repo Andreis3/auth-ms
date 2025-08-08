@@ -31,4 +31,4 @@ jobs:
         run: go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
 
       - name: Test Unit Cover
-        run: make unit-tests-cover
+        run: make unit-cover-verbose

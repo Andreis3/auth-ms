@@ -7,17 +7,17 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/andreis3/customers-ms/internal/domain/errors"
-	"github.com/andreis3/customers-ms/internal/domain/interfaces/adapter"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/iadapter"
 )
 
 type Cache struct {
 	client  *redis.Client
-	metrics adapter.Prometheus
-	tracer  adapter.Tracer
+	metrics iadapter.IPrometheus
+	tracer  iadapter.ITracer
 }
 
-func NewCache(client *redis.Client, metrics adapter.Prometheus, tracer adapter.Tracer) *Cache {
+func NewCache(client *redis.Client, metrics iadapter.IPrometheus, tracer iadapter.ITracer) *Cache {
 	return &Cache{
 		client:  client,
 		metrics: metrics,

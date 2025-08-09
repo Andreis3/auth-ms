@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/andreis3/customers-ms/internal/domain/validator"
+	"github.com/andreis3/auth-ms/internal/domain/validator"
 )
 
 const (

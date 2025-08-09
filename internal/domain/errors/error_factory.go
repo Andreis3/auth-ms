@@ -1,49 +1,5 @@
 package errors
 
-import "github.com/andreis3/customers-ms/internal/domain/validator"
-
-/********Domain Errors********/
-
-func InvalidCustomerError(validate *validator.Validator) *Error {
-	return &Error{
-		Code:            BadRequestCode,
-		Map:             validate.FieldErrorsGrouped(),
-		Errors:          validate.Errors(),
-		OriginFunc:      "CustomerProfile.Validate",
-		FriendlyMessage: "Validation failed for the provided input.",
-	}
-}
-
-func UnexpectedError(message string) *Error {
-	input := InputError{
-		Code:            InternalServerError,
-		Errors:          []string{message},
-		OriginFunc:      "UnexpectedError",
-		FriendlyMessage: ServerErrorFriendlyMessage,
-	}
-	return New(input)
-}
-
-func InvalidPasswordOrEmailError() *Error {
-	input := InputError{
-		Code:            BadRequestCode,
-		Errors:          []string{"Validation failed for the provided input."},
-		OriginFunc:      "CustomerProfile.Validate",
-		FriendlyMessage: "invalid password or email",
-	}
-	return New(input)
-}
-
-func ErrCustomerAlreadyExists() *Error {
-	input := InputError{
-		Code:            BadRequestCode,
-		Errors:          []string{"Already exists a customer with this email."},
-		OriginFunc:      "CreateCustomerCommand.Execute",
-		FriendlyMessage: "Customer already exists",
-	}
-	return New(input)
-}
-
 /********UnitOfWork Errors********/
 func ErrorTransactionAlreadyExists() *Error {
 	input := InputError{
@@ -60,16 +16,6 @@ func ErrorOpeningTransaction(err error) *Error {
 		Code:            InternalServerErrorCode,
 		Errors:          []string{err.Error()},
 		OriginFunc:      "UnitOfWork.WithTransaction",
-		FriendlyMessage: ServerErrorFriendlyMessage,
-	}
-	return New(input)
-}
-
-func ErrorRollBackTransactionEmpty() *Error {
-	input := InputError{
-		Code:            InternalServerErrorCode,
-		Errors:          []string{"Transaction is empty"},
-		OriginFunc:      "UnitOfWork.Rollback",
 		FriendlyMessage: ServerErrorFriendlyMessage,
 	}
 	return New(input)
@@ -102,77 +48,6 @@ func ErrorHashPassword(err error) *Error {
 		Errors:          []string{err.Error()},
 		OriginFunc:      "Bcrypt.Hash",
 		FriendlyMessage: ServerErrorFriendlyMessage,
-	}
-	return New(input)
-}
-
-func ErrorCompareHash(err error) *Error {
-	input := InputError{
-		Code:            InternalServerErrorCode,
-		Errors:          []string{err.Error()},
-		OriginFunc:      "Bcrypt.CompareHash",
-		FriendlyMessage: ServerErrorFriendlyMessage,
-	}
-	return New(input)
-}
-
-/********JWT Errors********/
-func ErrorCreateToken(err error) *Error {
-	input := InputError{
-		Code:            InternalServerErrorCode,
-		Errors:          []string{err.Error()},
-		OriginFunc:      "JWT.CreateToken",
-		FriendlyMessage: ServerErrorFriendlyMessage,
-	}
-	return New(input)
-}
-
-func ErrorValidateToken(err error) *Error {
-	input := InputError{
-		Code:            InternalServerErrorCode,
-		Errors:          []string{err.Error()},
-		OriginFunc:      "JWT.ValidateToken",
-		FriendlyMessage: ServerErrorFriendlyMessage,
-	}
-	return New(input)
-}
-
-func ErrorInvalidTokenAlgorithmError() *Error {
-	input := InputError{
-		Code:            InternalServerErrorCode,
-		Errors:          []string{"invalid token algorithm"},
-		OriginFunc:      "JWT.ValidateToken",
-		FriendlyMessage: ServerErrorFriendlyMessage,
-	}
-	return New(input)
-}
-
-func ErrorRefreshToken(err error) *Error {
-	input := InputError{
-		Code:            InternalServerErrorCode,
-		Errors:          []string{err.Error()},
-		OriginFunc:      "JWT.RefreshToken",
-		FriendlyMessage: ServerErrorFriendlyMessage,
-	}
-	return New(input)
-}
-
-func ErrorValidateTokenMessage(message string) *Error {
-	input := InputError{
-		Code:            InternalServerErrorCode,
-		Errors:          []string{message},
-		OriginFunc:      "JWT.ValidateToken",
-		FriendlyMessage: InvalidCredentialsMessage,
-	}
-	return New(input)
-}
-
-func ErrorInvalidCredentials() *Error {
-	input := InputError{
-		Code:            BadRequestCode,
-		Errors:          []string{"invalid credentials"},
-		OriginFunc:      "JWT.ValidateToken",
-		FriendlyMessage: InvalidCredentialsMessage,
 	}
 	return New(input)
 }
@@ -211,16 +86,6 @@ func ErrorJSON(err error) *Error {
 	return New(input)
 }
 
-func ErrorInvalidToken() *Error {
-	input := InputError{
-		Code:            UnauthorizedCode,
-		Errors:          []string{"invalid token"},
-		OriginFunc:      "JWT.ValidateToken",
-		FriendlyMessage: "invalid token",
-	}
-	return New(input)
-}
-
 /*********Redis Errors***************/
 func ErrorGetCache(err error) *Error {
 	input := InputError{
@@ -237,16 +102,6 @@ func ErrorSetCache(err error) *Error {
 		Code:            InternalServerErrorCode,
 		Errors:          []string{err.Error()},
 		OriginFunc:      "Redis.SetCache",
-		FriendlyMessage: ServerErrorFriendlyMessage,
-	}
-	return New(input)
-}
-
-func ErrorGenerateCacheKey(err error) *Error {
-	input := InputError{
-		Code:            InternalServerErrorCode,
-		Errors:          []string{err.Error()},
-		OriginFunc:      "Redis.GenerateCacheKey",
 		FriendlyMessage: ServerErrorFriendlyMessage,
 	}
 	return New(input)

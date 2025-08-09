@@ -3,21 +3,21 @@ package routes
 import (
 	"github.com/go-chi/chi/v5"
 
-	"github.com/andreis3/customers-ms/internal/domain/interfaces/adapter"
-	"github.com/andreis3/customers-ms/internal/infra/adapters/db"
-	"github.com/andreis3/customers-ms/internal/infra/configs"
-	"github.com/andreis3/customers-ms/internal/infra/factories/presentation/router-factory"
-	"github.com/andreis3/customers-ms/internal/presentation/http/routes"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/iadapter"
+	"github.com/andreis3/auth-ms/internal/infra/adapters/db"
+	"github.com/andreis3/auth-ms/internal/infra/configs"
+	"github.com/andreis3/auth-ms/internal/infra/factories/presentation/router-factory"
+	"github.com/andreis3/auth-ms/internal/presentation/http/routes"
 )
 
 type RegisterRoutesDeps struct {
 	Mux        *chi.Mux
 	PostgresDB *db.Postgres
 	Redis      *db.Redis
-	Log        adapter.Logger
-	Prometheus adapter.Prometheus
+	Log        iadapter.ILogger
+	Prometheus iadapter.IPrometheus
 	Conf       *configs.Configs
-	Tracer     adapter.Tracer
+	Tracer     iadapter.ITracer
 }
 
 func Setup(deps *RegisterRoutesDeps) {

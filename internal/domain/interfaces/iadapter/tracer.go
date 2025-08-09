@@ -1,8 +1,8 @@
-package adapter
+package iadapter
 
 import "context"
 
-type Tracer interface {
+type ITracer interface {
 	Start(ctx context.Context, spanName string) (context.Context, Span)
 }
 

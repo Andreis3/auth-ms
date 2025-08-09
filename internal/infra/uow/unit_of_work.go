@@ -6,19 +6,19 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/andreis3/customers-ms/internal/domain/errors"
-	"github.com/andreis3/customers-ms/internal/domain/interfaces/adapter"
-	"github.com/andreis3/customers-ms/internal/infra/adapters/db"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/iadapter"
+	"github.com/andreis3/auth-ms/internal/infra/adapters/db"
 )
 
 type UnitOfWork struct {
 	DB         *pgxpool.Pool
 	TX         pgx.Tx
-	prometheus adapter.Prometheus
-	tracer     adapter.Tracer
+	prometheus iadapter.IPrometheus
+	tracer     iadapter.ITracer
 }
 
-func NewUnitOfWork(db *pgxpool.Pool, prometheus adapter.Prometheus, tracer adapter.Tracer) *UnitOfWork {
+func NewUnitOfWork(db *pgxpool.Pool, prometheus iadapter.IPrometheus, tracer iadapter.ITracer) *UnitOfWork {
 	return &UnitOfWork{
 		DB:         db,
 		prometheus: prometheus,

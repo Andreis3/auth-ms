@@ -3,14 +3,14 @@ package entity
 import (
 	"time"
 
-	"github.com/andreis3/customers-ms/internal/domain/validator"
-	"github.com/andreis3/customers-ms/internal/domain/valueobject"
+	"github.com/andreis3/auth-ms/internal/domain/validator"
+	"github.com/andreis3/auth-ms/internal/domain/valueobject"
 )
 
-type roleTypes string
+type RoleTypes string
 
 const (
-	RoleUser roleTypes = "user"
+	RoleUser RoleTypes = "user"
 )
 
 type User struct {
@@ -20,7 +20,7 @@ type User struct {
 	password     valueobject.Password
 	passwordHash string
 	name         string
-	role         roleTypes
+	role         RoleTypes
 	createAT     time.Time
 	updateAT     time.Time
 	deletedAt    *time.Time
@@ -59,7 +59,7 @@ func (u *User) WithName(name string) *User {
 	return u
 }
 
-func (u *User) WithRole(role roleTypes) *User {
+func (u *User) WithRole(role RoleTypes) *User {
 	u.role = role
 	return u
 }
@@ -104,7 +104,7 @@ func (u *User) AssignPublicID(publicID string) *User {
 	return u
 }
 
-func (u *User) AssignRole(role roleTypes) *User {
+func (u *User) AssignRole(role RoleTypes) *User {
 	u.role = role
 	return u
 }

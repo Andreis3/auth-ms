@@ -98,44 +98,154 @@ func NewLogger() *Logger {
 	return logger
 }
 
-func (l *Logger) DebugJSON(msg string, info ...any) {
-	l.loggerJSON.Debug(msg, info...)
+func (l *Logger) DebugJSON(msg string, args ...any) {
+	var attrs []any
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case map[string]any:
+			for k, val := range v {
+				attrs = append(attrs, slog.Any(k, val))
+			}
+		default:
+			attrs = append(attrs, v) // já é slog.Attr ou outro tipo aceito
+		}
+	}
+	l.loggerJSON.Debug(msg, attrs...)
 }
 
-func (l *Logger) InfoJSON(msg string, info ...any) {
-	l.loggerJSON.Info(msg, info...)
+func (l *Logger) InfoJSON(msg string, args ...any) {
+	var attrs []any
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case map[string]any:
+			for k, val := range v {
+				attrs = append(attrs, slog.Any(k, val))
+			}
+		default:
+			attrs = append(attrs, v) // já é slog.Attr ou outro tipo aceito
+		}
+	}
+	l.loggerJSON.Info(msg, attrs...)
 }
 
-func (l *Logger) WarnJSON(msg string, info ...any) {
-	l.loggerJSON.Warn(msg, info...)
+func (l *Logger) WarnJSON(msg string, args ...any) {
+	var attrs []any
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case map[string]any:
+			for k, val := range v {
+				attrs = append(attrs, slog.Any(k, val))
+			}
+		default:
+			attrs = append(attrs, v) // já é slog.Attr ou outro tipo aceito
+		}
+	}
+	l.loggerJSON.Warn(msg, attrs...)
 }
 
-func (l *Logger) ErrorJSON(msg string, info ...any) {
-	l.loggerJSON.Error(msg, info...)
+func (l *Logger) ErrorJSON(msg string, args ...any) {
+	var attrs []any
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case map[string]any:
+			for k, val := range v {
+				attrs = append(attrs, slog.Any(k, val))
+			}
+		default:
+			attrs = append(attrs, v) // já é slog.Attr ou outro tipo aceito
+		}
+	}
+	l.loggerJSON.Error(msg, attrs...)
 }
 
-func (l *Logger) CriticalJSON(msg string, info ...any) {
-	l.loggerJSON.Log(context.Background(), LevelCritical, msg, info...) // Nível crítico = 5 (LevelError + 1)
+func (l *Logger) CriticalJSON(msg string, args ...any) {
+	var attrs []any
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case map[string]any:
+			for k, val := range v {
+				attrs = append(attrs, slog.Any(k, val))
+			}
+		default:
+			attrs = append(attrs, v) // já é slog.Attr ou outro tipo aceito
+		}
+	}
+	l.loggerJSON.Log(context.Background(), LevelCritical, msg, attrs...) // Nível crítico = 5 (LevelError + 1)
 }
 
-func (l *Logger) DebugText(msg string, info ...any) {
-	l.loggerText.Debug(msg, info...)
+func (l *Logger) DebugText(msg string, args ...any) {
+	var attrs []any
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case map[string]any:
+			for k, val := range v {
+				attrs = append(attrs, slog.Any(k, val))
+			}
+		default:
+			attrs = append(attrs, v) // já é slog.Attr ou outro tipo aceito
+		}
+	}
+	l.loggerText.Debug(msg, args...)
 }
 
-func (l *Logger) InfoText(msg string, info ...any) {
-	l.loggerText.Info(msg, info...)
+func (l *Logger) InfoText(msg string, args ...any) {
+	var attrs []any
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case map[string]any:
+			for k, val := range v {
+				attrs = append(attrs, slog.Any(k, val))
+			}
+		default:
+			attrs = append(attrs, v) // já é slog.Attr ou outro tipo aceito
+		}
+	}
+	l.loggerText.Info(msg, attrs...)
 }
 
-func (l *Logger) WarnText(msg string, info ...any) {
-	l.loggerText.Warn(msg, info...)
+func (l *Logger) WarnText(msg string, args ...any) {
+	var attrs []any
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case map[string]any:
+			for k, val := range v {
+				attrs = append(attrs, slog.Any(k, val))
+			}
+		default:
+			attrs = append(attrs, v) // já é slog.Attr ou outro tipo aceito
+		}
+	}
+	l.loggerText.Warn(msg, attrs...)
 }
 
-func (l *Logger) ErrorText(msg string, info ...any) {
-	l.loggerText.Error(msg, info...)
+func (l *Logger) ErrorText(msg string, args ...any) {
+	var attrs []any
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case map[string]any:
+			for k, val := range v {
+				attrs = append(attrs, slog.Any(k, val))
+			}
+		default:
+			attrs = append(attrs, v) // já é slog.Attr ou outro tipo aceito
+		}
+	}
+	l.loggerText.Error(msg, attrs...)
 }
 
-func (l *Logger) CriticalText(msg string, info ...any) {
-	l.loggerText.Log(context.Background(), LevelCritical, msg, info...) // Nível crítico = 5 (LevelError + 1)
+func (l *Logger) CriticalText(msg string, args ...any) {
+	var attrs []any
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case map[string]any:
+			for k, val := range v {
+				attrs = append(attrs, slog.Any(k, val))
+			}
+		default:
+			attrs = append(attrs, v) // já é slog.Attr ou outro tipo aceito
+		}
+	}
+	l.loggerText.Log(context.Background(), LevelCritical, msg, attrs...) // Nível crítico = 5 (LevelError + 1)
 }
 
 func (l *Logger) WithTrace(ctx context.Context) *slog.Logger {

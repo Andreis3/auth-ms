@@ -5,7 +5,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/andreis3/customers-ms/internal/presentation/http/helpers"
+	"github.com/andreis3/auth-ms/internal/presentation/http/helpers"
 )
 
 type Metrics struct{}

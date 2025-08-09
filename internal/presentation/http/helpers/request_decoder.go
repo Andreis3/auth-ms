@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/andreis3/customers-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
 )
 
 func RequestDecoder[T any](req *http.Request) (T, *errors.Error) {

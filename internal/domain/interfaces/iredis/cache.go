@@ -1,12 +1,12 @@
-package redis
+package iredis
 
 import (
 	"context"
 
-	"github.com/andreis3/customers-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
 )
 
-type Cache interface {
+type ICache interface {
 	Get(ctx context.Context, key string, target any) (bool, *errors.Error)
 	Set(ctx context.Context, key string, value any, ttlSeconds int) *errors.Error
 }

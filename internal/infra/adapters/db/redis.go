@@ -5,7 +5,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/andreis3/customers-ms/internal/infra/configs"
+	"github.com/andreis3/auth-ms/internal/infra/configs"
 )
 
 type Redis struct {

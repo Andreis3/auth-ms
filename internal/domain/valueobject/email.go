@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/andreis3/customers-ms/internal/domain/validator"
+	"github.com/andreis3/auth-ms/internal/domain/validator"
 )
 
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)

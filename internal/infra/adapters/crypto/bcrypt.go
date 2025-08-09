@@ -3,7 +3,7 @@ package crypto
 import (
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/andreis3/customers-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
 )
 
 type Bcrypt struct{}

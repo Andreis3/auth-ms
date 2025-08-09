@@ -13,10 +13,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.opentelemetry.io/otel"
 
-	"github.com/andreis3/customers-ms/internal/domain/interfaces/adapter"
-	"github.com/andreis3/customers-ms/internal/infra/adapters/logger"
-	"github.com/andreis3/customers-ms/internal/infra/configs"
-	"github.com/andreis3/customers-ms/internal/util"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/iadapter"
+	"github.com/andreis3/auth-ms/internal/infra/adapters/logger"
+	"github.com/andreis3/auth-ms/internal/infra/configs"
+	"github.com/andreis3/auth-ms/internal/util"
 )
 
 var (
@@ -28,7 +28,7 @@ type Postgres struct {
 	Pool *pgxpool.Pool
 }
 
-func NewPoolConnections(conf *configs.Configs, metrics adapter.Prometheus) *Postgres {
+func NewPoolConnections(conf *configs.Configs, metrics iadapter.IPrometheus) *Postgres {
 	log := logger.NewLogger()
 	singleton.Do(func() {
 		connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",

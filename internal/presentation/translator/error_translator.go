@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 
-	"github.com/andreis3/customers-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
 )
 
 type ProtocolError struct {

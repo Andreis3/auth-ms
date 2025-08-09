@@ -1,4 +1,4 @@
-module github.com/andreis3/customers-ms
+module github.com/andreis3/auth-ms
 
 go 1.24.0
 

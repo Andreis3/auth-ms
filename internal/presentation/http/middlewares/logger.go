@@ -4,15 +4,15 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/andreis3/customers-ms/internal/domain/interfaces/adapter"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/iadapter"
 )
 
 type Logging struct {
-	logger adapter.Logger
-	tracer adapter.Tracer
+	logger iadapter.ILogger
+	tracer iadapter.ITracer
 }
 
-func NewLoggingMiddleware(logger adapter.Logger, tracer adapter.Tracer) *Logging {
+func NewLoggingMiddleware(logger iadapter.ILogger, tracer iadapter.ITracer) *Logging {
 	return &Logging{
 		logger: logger,
 		tracer: tracer,

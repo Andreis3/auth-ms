@@ -12,14 +12,14 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/andreis3/customers-ms/internal/domain/interfaces/adapter"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/iadapter"
 )
 
 type otelTracer struct {
 	tracer trace.Tracer
 }
 
-func (o *otelTracer) Start(ctx context.Context, spanName string) (context.Context, adapter.Span) {
+func (o *otelTracer) Start(ctx context.Context, spanName string) (context.Context, iadapter.Span) {
 	ctx, s := o.tracer.Start(ctx, spanName)
 	return ctx, &otelSpan{s}
 }
@@ -36,7 +36,7 @@ func (s *otelSpan) RecordError(err error) {
 	s.Span.RecordError(err)
 }
 
-func (s *otelSpan) SpanContext() adapter.SpanContext {
+func (s *otelSpan) SpanContext() iadapter.SpanContext {
 	return &otelSpanContext{s.Span.SpanContext()} // ✅ chama o SpanContext do campo do OTEL
 }
 
@@ -48,8 +48,8 @@ func (sc *otelSpanContext) TraceID() string {
 	return sc.SpanContext.TraceID().String()
 }
 
-// ✅ Esta função inicializa o OpenTelemetry por completo e retorna o adapter.Tracer
-func InitOtelTracer(ctx context.Context, serviceName string) (adapter.Tracer, func(context.Context) error) {
+// ✅ Esta função inicializa o OpenTelemetry por completo e retorna o iadapter.ITracer
+func InitOtelTracer(ctx context.Context, serviceName string) (iadapter.ITracer, func(context.Context) error) {
 	exporter, err := otlptracehttp.New(
 		ctx,
 		otlptracehttp.WithEndpoint("localhost:4318"),
@@ -79,6 +79,6 @@ func InitOtelTracer(ctx context.Context, serviceName string) (adapter.Tracer, fu
 
 	otel.SetTracerProvider(provider)
 
-	// Retorna o adapter.Tracer e a função de shutdown
+	// Retorna o adapter.ITracer e a função de shutdown
 	return &otelTracer{tracer: provider.Tracer(serviceName)}, provider.Shutdown
 }

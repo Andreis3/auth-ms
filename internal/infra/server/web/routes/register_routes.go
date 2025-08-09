@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/andreis3/customers-ms/internal/domain/interfaces/adapter"
-	"github.com/andreis3/customers-ms/internal/presentation/http/helpers"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/iadapter"
+	"github.com/andreis3/auth-ms/internal/presentation/http/helpers"
 )
 
 type ModuleRoutes interface {
@@ -16,13 +16,13 @@ type ModuleRoutes interface {
 
 type RegisterRoutes struct {
 	mux     *chi.Mux
-	log     adapter.Logger
+	log     iadapter.ILogger
 	modules []ModuleRoutes
 }
 
 func NewRegisterRoutes(
 	mux *chi.Mux,
-	log adapter.Logger,
+	log iadapter.ILogger,
 	modules []ModuleRoutes,
 ) *RegisterRoutes {
 	return &RegisterRoutes{

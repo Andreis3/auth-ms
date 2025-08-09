@@ -3,8 +3,8 @@ package routes
 import (
 	"net/http"
 
-	"github.com/andreis3/customers-ms/internal/presentation/http/handler"
-	"github.com/andreis3/customers-ms/internal/presentation/http/helpers"
+	"github.com/andreis3/auth-ms/internal/presentation/http/handler"
+	"github.com/andreis3/auth-ms/internal/presentation/http/helpers"
 )
 
 type HealthCheck struct{}

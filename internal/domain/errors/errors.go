@@ -8,12 +8,12 @@ import (
 )
 
 type Error struct {
-	Code            Code
-	Errors          []string
-	Map             map[string]any
-	OriginFunc      string
-	Cause           string
-	FriendlyMessage string
+	Code            Code           `json:"code"`
+	Errors          []string       `json:"errors"`
+	Map             map[string]any `json:"map,omitempty"`
+	OriginFunc      string         `json:"originFunc,omitempty"`
+	Cause           string         `json:"cause,omitempty"`
+	FriendlyMessage string         `json:"friendlyMessage,omitempty"`
 }
 
 type InputError Error

@@ -13,13 +13,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
-	"github.com/andreis3/customers-ms/internal/domain/interfaces/adapter"
-	"github.com/andreis3/customers-ms/internal/infra/adapters/db"
-	"github.com/andreis3/customers-ms/internal/infra/adapters/logger"
-	"github.com/andreis3/customers-ms/internal/infra/adapters/observability"
-	"github.com/andreis3/customers-ms/internal/infra/configs"
-	"github.com/andreis3/customers-ms/internal/infra/server/web/routes"
-	"github.com/andreis3/customers-ms/internal/util"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/iadapter"
+	"github.com/andreis3/auth-ms/internal/infra/adapters/db"
+	"github.com/andreis3/auth-ms/internal/infra/adapters/logger"
+	"github.com/andreis3/auth-ms/internal/infra/adapters/observability"
+	"github.com/andreis3/auth-ms/internal/infra/configs"
+	"github.com/andreis3/auth-ms/internal/infra/server/web/routes"
+	"github.com/andreis3/auth-ms/internal/util"
 )
 
 type Server struct {
@@ -27,7 +27,7 @@ type Server struct {
 	Postgres   *db.Postgres
 	Log        logger.Logger
 	Prometheus *observability.Prometheus
-	Tracer     adapter.Tracer
+	Tracer     iadapter.ITracer
 }
 
 func NewServer(conf *configs.Configs, log logger.Logger) *Server {

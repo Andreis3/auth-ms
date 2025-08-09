@@ -19,10 +19,10 @@ unit-cover-verbose:
 	@go test ./tests/unit/... -coverpkg ./internal/... --tags=unit -v
 
 unit-report:
-	mkdir -p "coverage" \
-	&& go test ./tests/unit/... -coverprofile=coverage/cover.out -coverpkg ./internal/... --tags=unit \
-	&& go tool cover -html=coverage/cover.out -o coverage/cover.html \
-	&& go tool cover -func=coverage/cover.out -o coverage/cover.functions.html
+	mkdir -p "tests/unit/coverage" \
+	&& go test ./tests/unit/... -coverprofile=tests/unit/coverage/cover.out -coverpkg ./internal/... --tags=unit \
+	&& go tool cover -html=tests/unit/coverage/cover.out -o tests/unit/coverage/cover.html \
+	&& go tool cover -func=tests/unit/coverage/cover.out -o tests/unit/coverage/cover.functions.html
 
 up:
 	@docker compose -f docker-compose.yml up -d --build

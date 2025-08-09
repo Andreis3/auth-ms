@@ -6,3 +6,4 @@ docker/replica1/data
 docker/replica2/data
 docker/loki-data
 docker/loki/loki-data
+tests/unit/coverage

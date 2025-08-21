@@ -7,10 +7,10 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/andreis3/auth-ms/internal/domain/interfaces/iadapter"
+	"github.com/andreis3/auth-ms/internal/auth/domain/interfaces/adapter"
 )
 
-var _ iadapter.ILogger = (*LoggerMock)(nil)
+var _ adapter.Logger = (*LoggerMock)(nil)
 
 type LoggerMock struct{ mock.Mock }
 

@@ -3,14 +3,14 @@ package main
 import (
 	"os"
 
-	"github.com/andreis3/auth-ms/internal/infra/adapters/logger"
-	"github.com/andreis3/auth-ms/internal/infra/configs"
-	"github.com/andreis3/auth-ms/internal/infra/server/web"
-	"github.com/andreis3/auth-ms/internal/util"
+	"github.com/andreis3/auth-ms/internal/auth/adapter/output/logger"
+	"github.com/andreis3/auth-ms/internal/auth/infra/config"
+	"github.com/andreis3/auth-ms/internal/auth/infra/server/http"
+	"github.com/andreis3/auth-ms/internal/auth/util"
 )
 
 func main() {
-	conf := configs.LoadConfig()
+	conf := config.LoadConfig()
 	log := logger.NewLogger()
 
 	if conf == nil {
@@ -18,7 +18,7 @@ func main() {
 		os.Exit(util.ExitFailure)
 	}
 
-	serverWeb := web.NewServer(conf, *log)
+	serverWeb := http.NewServer(conf, *log)
 
 	go serverWeb.Start()
 

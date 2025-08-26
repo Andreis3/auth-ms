@@ -14,31 +14,31 @@ type ProtocolError struct {
 }
 
 var ErrorTranslator = map[errors.Code]ProtocolError{
-	errors.BadRequestCode: {
+	errors.ErrBadRequest: {
 		HTTPStatus: http.StatusBadRequest,
 		GRPCCode:   codes.InvalidArgument,
 	},
-	errors.NotFoundCode: {
+	errors.ErrNotFound: {
 		HTTPStatus: http.StatusNotFound,
 		GRPCCode:   codes.NotFound,
 	},
-	errors.InternalServerErrorCode: {
+	errors.ErrInternal: {
 		HTTPStatus: http.StatusInternalServerError,
 		GRPCCode:   codes.Internal,
 	},
-	errors.UnauthorizedCode: {
+	errors.ErrUnauthorized: {
 		HTTPStatus: http.StatusUnauthorized,
 		GRPCCode:   codes.Unauthenticated,
 	},
-	errors.ForbiddenCode: {
+	errors.ErrForbidden: {
 		HTTPStatus: http.StatusForbidden,
 		GRPCCode:   codes.PermissionDenied,
 	},
-	errors.ConflictCode: {
+	errors.ErrConflict: {
 		HTTPStatus: http.StatusConflict,
 		GRPCCode:   codes.AlreadyExists,
 	},
-	errors.UnprocessableEntityCode: {
+	errors.ErrUnprocessableEntity: {
 		HTTPStatus: http.StatusUnprocessableEntity,
 		GRPCCode:   codes.InvalidArgument,
 	},

@@ -13,12 +13,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
-	"github.com/andreis3/auth-ms/internal/auth/adapter/output/logger"
-	"github.com/andreis3/auth-ms/internal/auth/adapter/output/metrics"
-	"github.com/andreis3/auth-ms/internal/auth/adapter/output/tracer"
 	"github.com/andreis3/auth-ms/internal/auth/domain/interfaces/adapter"
 	"github.com/andreis3/auth-ms/internal/auth/infra/config"
 	db2 "github.com/andreis3/auth-ms/internal/auth/infra/db"
+	"github.com/andreis3/auth-ms/internal/auth/infra/logger"
+	"github.com/andreis3/auth-ms/internal/auth/infra/observability"
 	"github.com/andreis3/auth-ms/internal/auth/infra/server/http/routes"
 	"github.com/andreis3/auth-ms/internal/auth/util"
 )
@@ -27,19 +26,19 @@ type Server struct {
 	HTTPServer *http.Server
 	Postgres   *db2.Postgres
 	Log        logger.Logger
-	Prometheus *metrics.Prometheus
+	Prometheus *observability.Prometheus
 	Tracer     adapter.Tracer
 }
 
 func NewServer(conf *config.Configs, log logger.Logger) *Server {
 	start := time.Now()
 
-	prometheus := metrics.NewPrometheus()
+	prometheus := observability.NewPrometheus()
 	pool := db2.NewPoolConnections(conf, prometheus)
 
 	redis := db2.NewRedis(*conf)
 
-	tracer, _ := tracer.InitOtelTracer(context.Background(), "customers-ms")
+	tracer, _ := observability.InitOtelTracer(context.Background(), "customers-ms")
 
 	mux := chi.NewRouter()
 

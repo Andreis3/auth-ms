@@ -3,7 +3,7 @@ package dto
 type CreateAuthUserInput struct {
 	Email           string `json:"email"`
 	Password        string `json:"password"`
-	PasswordConfirm string `json:"password_confirm"`
+	PasswordConfirm string `json:"password_confirm,omitempty"`
 	Name            string `json:"name"`
 }
 

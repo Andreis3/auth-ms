@@ -1,15 +1,15 @@
 package errors
 
-type Code string
+//type Code string
 
 const (
-	BadRequestCode          Code = "DM-400"
-	NotFoundCode            Code = "DM-404"
-	InternalServerErrorCode Code = "IMF-500"
-	UnauthorizedCode        Code = "DM-401"
-	ForbiddenCode           Code = "DM-403"
-	ConflictCode            Code = "DM-409"
-	UnprocessableEntityCode Code = "DM-422"
+	ErrBadRequest          Code = "ERR_BAD_REQUEST"
+	ErrNotFound            Code = "ERR_NOT_FOUND"
+	ErrUnauthorized        Code = "ERR_UNAUTHORIZED"
+	ErrForbidden           Code = "ERR_FORBIDDEN"
+	ErrConflict            Code = "ERR_CONFLICT"
+	ErrUnprocessableEntity Code = "ERR_UNPROCESSABLE"
+	ErrInternal            Code = "ERR_INTERNAL"
 )
 
 const (

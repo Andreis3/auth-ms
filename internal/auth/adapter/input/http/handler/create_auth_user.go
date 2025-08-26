@@ -6,8 +6,8 @@ import (
 	"time"
 
 	helpers2 "github.com/andreis3/auth-ms/internal/auth/adapter/input/http/helpers"
-	"github.com/andreis3/auth-ms/internal/auth/application/dto"
-	"github.com/andreis3/auth-ms/internal/auth/application/port/command"
+	"github.com/andreis3/auth-ms/internal/auth/app/dto"
+	"github.com/andreis3/auth-ms/internal/auth/app/port/command"
 	"github.com/andreis3/auth-ms/internal/auth/domain/interfaces/adapter"
 )
 

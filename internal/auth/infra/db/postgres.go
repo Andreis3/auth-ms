@@ -13,9 +13,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.opentelemetry.io/otel"
 
-	"github.com/andreis3/auth-ms/internal/auth/adapter/output/logger"
 	"github.com/andreis3/auth-ms/internal/auth/domain/interfaces/adapter"
 	"github.com/andreis3/auth-ms/internal/auth/infra/config"
+	"github.com/andreis3/auth-ms/internal/auth/infra/logger"
 	"github.com/andreis3/auth-ms/internal/auth/util"
 )
 

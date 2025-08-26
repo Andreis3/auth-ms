@@ -43,7 +43,7 @@ func ResponseError(write http.ResponseWriter, err *errors.Error) {
 
 	result := TypeResponseError{
 		CodeError:       string(err.Code),
-		ErrorFields:     err.Map,
+		ErrorFields:     err.Fields,
 		FriendlyMessage: err.FriendlyMessage,
 	}
 

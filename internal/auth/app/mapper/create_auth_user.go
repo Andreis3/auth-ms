@@ -1,7 +1,7 @@
 package mapper
 
 import (
-	"github.com/andreis3/auth-ms/internal/auth/application/dto"
+	"github.com/andreis3/auth-ms/internal/auth/app/dto"
 	"github.com/andreis3/auth-ms/internal/auth/domain/entity"
 )
 

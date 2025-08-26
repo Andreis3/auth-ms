@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/andreis3/auth-ms/internal/auth/adapter/output/logger"
 	"github.com/andreis3/auth-ms/internal/auth/infra/config"
+	"github.com/andreis3/auth-ms/internal/auth/infra/logger"
 	"github.com/andreis3/auth-ms/internal/auth/infra/server/http"
 	"github.com/andreis3/auth-ms/internal/auth/util"
 )

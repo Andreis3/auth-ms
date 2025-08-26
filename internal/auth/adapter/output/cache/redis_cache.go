@@ -39,7 +39,7 @@ func (c *Cache) Get(ctx context.Context, key string, target any) (bool, *errors.
 		return false, nil
 	}
 
-	if err := json.Unmarshal([]byte(result), target); err != nil {
+	if err = json.Unmarshal([]byte(result), target); err != nil {
 		return false, errors.ErrorGetCache(err)
 	}
 

@@ -1,5 +1,5 @@
 // internal/infra/adapters/observability/otel_tracer.go
-package tracer
+package observability
 
 import (
 	"context"

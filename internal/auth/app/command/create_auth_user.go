@@ -3,13 +3,14 @@ package command
 import (
 	"context"
 
-	"github.com/andreis3/auth-ms/internal/auth/application/dto"
-	"github.com/andreis3/auth-ms/internal/auth/application/mapper"
-	port2 "github.com/andreis3/auth-ms/internal/auth/application/port/service"
+	"github.com/andreis3/auth-ms/internal/auth/app/dto"
+	"github.com/andreis3/auth-ms/internal/auth/app/mapper"
+	port2 "github.com/andreis3/auth-ms/internal/auth/app/port/service"
 	"github.com/andreis3/auth-ms/internal/auth/domain/entity"
 	"github.com/andreis3/auth-ms/internal/auth/domain/errors"
 	"github.com/andreis3/auth-ms/internal/auth/domain/interfaces/adapter"
 	"github.com/andreis3/auth-ms/internal/auth/domain/port"
+	"github.com/andreis3/auth-ms/internal/auth/infra/logger"
 )
 
 type CreateAuthUser struct {
@@ -46,8 +47,24 @@ func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserIn
 	c.log.InfoJSON("Creating auth user",
 		map[string]any{
 			"trace_id": tracerID,
-			"email":    input.Email,
+			"body": logger.RedactStruct[dto.CreateAuthUserInput](input, "password",
+				"Password_confirm"),
 		})
+
+	user := mapper.ToUser(input)
+	user.AssignPublicID(c.utils.UUID())
+	user.AssignRole(entity.RoleUser)
+	isValid := user.Validate()
+
+	if isValid.HasErrors() {
+		c.log.CriticalJSON("User validation failed",
+			map[string]any{
+				"trace_id": tracerID,
+				"errors":   isValid.FieldErrorsFlat(),
+			})
+		span.RecordError(isValid)
+		return nil, errors.InvalidEntity(isValid, "user")
+	}
 
 	err := c.userService.ValidateEmailAvailability(ctx, input.Email)
 	if err != nil {
@@ -58,17 +75,6 @@ func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserIn
 				"error":    err.Error(),
 			})
 		return nil, err
-	}
-
-	user := mapper.ToUser(input)
-
-	user.AssignPublicID(c.utils.UUID())
-	user.AssignRole(entity.RoleUser)
-
-	isValid := user.Validate()
-
-	if isValid.HasErrors() {
-		return nil, errors.InvalidEntity(isValid, "user")
 	}
 
 	hashedPassword, err := c.bcrypt.Hash(user.Password())

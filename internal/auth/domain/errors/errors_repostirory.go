@@ -3,31 +3,19 @@ package errors
 /********Repository Errors********/
 
 func CreateUserError(err error) *Error {
-	input := InputError{
-		Code:            InternalServerErrorCode,
-		Errors:          []string{err.Error()},
-		OriginFunc:      "UserRepository.CreateUser",
-		FriendlyMessage: "Ops... something went wrong. Please try again later.",
-	}
-	return New(input)
+	return Wrap(err, ErrInternal, "Error creating user").
+		WithOrigin("UserRepository.CreateUser").
+		WithFriendly("Ops... something went wrong. Please try again later.")
 }
 
 func ErrorAlreadyExistsUser(err error) *Error {
-	input := InputError{
-		Code:            ConflictCode,
-		Errors:          []string{err.Error()},
-		OriginFunc:      "UserRepository.CreateUser",
-		FriendlyMessage: "User with this email already exists.",
-	}
-	return New(input)
+	return Wrap(err, ErrConflict, "User already exists").
+		WithOrigin("UserRepository.CreateUser").
+		WithFriendly("User with this email already exists.")
 }
 
 func ErrorFindUserByEmail(err error) *Error {
-	input := InputError{
-		Code:            InternalServerErrorCode,
-		Errors:          []string{err.Error()},
-		OriginFunc:      "UserRepository.FindUserByEmail",
-		FriendlyMessage: "Ops... something went wrong. Please try again later.",
-	}
-	return New(input)
+	return Wrap(err, ErrInternal, "Error finding user by email").
+		WithOrigin("UserRepository.FindUserByEmail").
+		WithFriendly("Ops... something went wrong. Please try again later.")
 }

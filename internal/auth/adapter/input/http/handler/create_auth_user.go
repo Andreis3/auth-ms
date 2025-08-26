@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	helpers2 "github.com/andreis3/auth-ms/internal/auth/adapter/input/http/helpers"
+	"github.com/andreis3/auth-ms/internal/auth/adapter/input/http/helpers"
 	"github.com/andreis3/auth-ms/internal/auth/app/dto"
 	"github.com/andreis3/auth-ms/internal/auth/app/port/command"
 	"github.com/andreis3/auth-ms/internal/auth/domain/interfaces/adapter"
@@ -46,24 +46,24 @@ func (h *CreateAuthUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		span.End()
 	}()
 
-	input, err := helpers2.RequestDecoder[dto.CreateAuthUserInput](r)
+	input, err := helpers.RequestDecoder[dto.CreateAuthUserInput](r)
 	if err != nil {
 		span.RecordError(err)
 		h.log.ErrorJSON("failed decode request body",
 			slog.String("trace_id", traceID),
 			slog.Any("error", err))
-		helpers2.ResponseError(w, err)
+		helpers.ResponseError(w, err)
 		h.prometheus.ObserveRequestDuration("/auth/signup", "http", http.StatusCreated, "error", float64(end.Milliseconds()))
 		return
 	}
 
 	res, err := h.command.Execute(ctx, input)
 	if err != nil {
-		helpers2.ResponseError(w, err)
+		helpers.ResponseError(w, err)
 		h.prometheus.ObserveRequestDuration("/auth/signup", "http", http.StatusCreated, "error", float64(end.Milliseconds()))
 		return
 	}
 
-	helpers2.ResponseSuccess(w, http.StatusCreated, res)
+	helpers.ResponseSuccess(w, http.StatusCreated, res)
 	h.prometheus.ObserveRequestDuration("/auth/signup", "http", http.StatusCreated, "success", float64(end.Milliseconds()))
 }

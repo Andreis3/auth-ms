@@ -5,7 +5,7 @@ import (
 
 	"github.com/andreis3/auth-ms/internal/auth/app/dto"
 	"github.com/andreis3/auth-ms/internal/auth/app/mapper"
-	port2 "github.com/andreis3/auth-ms/internal/auth/app/port/service"
+	"github.com/andreis3/auth-ms/internal/auth/app/port/service"
 	"github.com/andreis3/auth-ms/internal/auth/domain/entity"
 	"github.com/andreis3/auth-ms/internal/auth/domain/errors"
 	"github.com/andreis3/auth-ms/internal/auth/domain/interfaces/adapter"
@@ -15,7 +15,7 @@ import (
 
 type CreateAuthUser struct {
 	userRepository port.UserRepository
-	userService    port2.UserService
+	userService    service.UserService
 	bcrypt         adapter.Bcrypt
 	log            adapter.Logger
 	tracer         adapter.Tracer
@@ -24,7 +24,7 @@ type CreateAuthUser struct {
 
 func NewCreateAuthUser(
 	userRepository port.UserRepository,
-	userService port2.UserService,
+	userService service.UserService,
 	bcrypt adapter.Bcrypt,
 	log adapter.Logger,
 	tracer adapter.Tracer,

@@ -10,9 +10,9 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/andreis3/auth-ms/internal/auth/domain/entity"
-	errors2 "github.com/andreis3/auth-ms/internal/auth/domain/errors"
-	"github.com/andreis3/auth-ms/internal/auth/domain/interfaces/adapter"
+	"github.com/andreis3/auth-ms/internal/domain/entity"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
 	"github.com/andreis3/auth-ms/tests/suts"
 )
 
@@ -72,7 +72,7 @@ var _ = Describe("INTERNAL :: APP :: SERVICE :: USER_SERVICE", func() {
 				sut.Span.On("End").Return()
 				sut.Span.On("RecordError", mock.Anything).Return()
 
-				sut.Repo.On("FindUserByEmail", ctx, email).Return(nil, errors2.ErrorTransactionAlreadyExists())
+				sut.Repo.On("FindUserByEmail", ctx, email).Return(nil, errors.ErrorTransactionAlreadyExists())
 				sut.Log.On("InfoJSON", mock.Anything, mock.Anything).Return()
 
 				sut.Log.On("ErrorJSON", mock.Anything, mock.Anything).Return()
@@ -83,7 +83,7 @@ var _ = Describe("INTERNAL :: APP :: SERVICE :: USER_SERVICE", func() {
 				err := userService.ValidateEmailAvailability(context.Background(), "test@test.com")
 
 				Expect(err).ToNot(BeNil())
-				Expect(err).To(Equal(errors2.ErrorTransactionAlreadyExists()))
+				Expect(err).To(Equal(errors.ErrorTransactionAlreadyExists()))
 				Expect(sut.Repo.AssertNumberOfCalls(GinkgoT(), "FindUserByEmail", 1)).To(BeTrue())
 				Expect(sut.Tracer.AssertNumberOfCalls(GinkgoT(), "Start", 1)).To(BeTrue())
 				Expect(sut.Span.AssertNumberOfCalls(GinkgoT(), "End", 1)).To(BeTrue())
@@ -143,7 +143,7 @@ var _ = Describe("INTERNAL :: APP :: SERVICE :: USER_SERVICE", func() {
 				err := userService.ValidateEmailAvailability(context.Background(), "test@test.com")
 
 				Expect(err).ToNot(BeNil())
-				Expect(err).To(Equal(errors2.ErrorAlreadyExists(user.PublicID())))
+				Expect(err).To(Equal(errors.ErrorAlreadyExists(user.PublicID())))
 				Expect(sut.Repo.AssertNumberOfCalls(GinkgoT(), "FindUserByEmail", 1)).To(BeTrue())
 				Expect(sut.Tracer.AssertNumberOfCalls(GinkgoT(), "Start", 1)).To(BeTrue())
 				Expect(sut.Span.AssertNumberOfCalls(GinkgoT(), "End", 1)).To(BeTrue())

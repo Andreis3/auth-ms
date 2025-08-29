@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/andreis3/auth-ms/internal/auth/domain/interfaces/adapter"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
 )
 
 var _ adapter.Logger = (*LoggerMock)(nil)

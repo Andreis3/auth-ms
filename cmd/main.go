@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/andreis3/auth-ms/internal/auth/infra/config"
-	"github.com/andreis3/auth-ms/internal/auth/infra/logger"
-	"github.com/andreis3/auth-ms/internal/auth/infra/server/http"
-	"github.com/andreis3/auth-ms/internal/auth/util"
+	"github.com/andreis3/auth-ms/internal/infra/config"
+	"github.com/andreis3/auth-ms/internal/infra/logger"
+	"github.com/andreis3/auth-ms/internal/infra/server/http"
+	"github.com/andreis3/auth-ms/internal/util"
 )
 
 func main() {

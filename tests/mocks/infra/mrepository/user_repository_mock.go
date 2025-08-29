@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/andreis3/auth-ms/internal/auth/domain/entity"
-	"github.com/andreis3/auth-ms/internal/auth/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/entity"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
 )
 
 type UserRepositoryMock struct{ mock.Mock }

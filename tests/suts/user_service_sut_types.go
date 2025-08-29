@@ -3,7 +3,7 @@
 package suts
 
 import (
-	"github.com/andreis3/auth-ms/internal/auth/app/service"
+	"github.com/andreis3/auth-ms/internal/app/service"
 	"github.com/andreis3/auth-ms/tests/mocks/infra/madapters"
 	"github.com/andreis3/auth-ms/tests/mocks/infra/mrepository"
 )

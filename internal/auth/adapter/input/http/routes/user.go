@@ -5,7 +5,7 @@ import (
 
 	"github.com/andreis3/auth-ms/internal/auth/adapter/input/http/helpers"
 	"github.com/andreis3/auth-ms/internal/auth/adapter/input/http/middlewares"
-	"github.com/andreis3/auth-ms/internal/auth/infra/factory/presentation/handler"
+	"github.com/andreis3/auth-ms/internal/auth/infra/factory/http/handler"
 )
 
 type User struct {

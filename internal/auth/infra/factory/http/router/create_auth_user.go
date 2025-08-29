@@ -6,7 +6,7 @@ import (
 	"github.com/andreis3/auth-ms/internal/auth/domain/interfaces/adapter"
 	"github.com/andreis3/auth-ms/internal/auth/infra/config"
 	"github.com/andreis3/auth-ms/internal/auth/infra/db"
-	"github.com/andreis3/auth-ms/internal/auth/infra/factory/presentation/handler"
+	"github.com/andreis3/auth-ms/internal/auth/infra/factory/http/handler"
 )
 
 func MakeCreateAuthUserRouter(

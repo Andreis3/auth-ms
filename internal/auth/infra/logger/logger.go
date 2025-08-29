@@ -22,14 +22,14 @@ type Logger struct {
 }
 
 func NewLogger() *Logger {
-	// Saídas
+	// outputs
 	outJSON := os.Stdout
 	outText := os.Stderr
 
 	jsonHandler := slog.NewJSONHandler(outJSON, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
 		ReplaceAttr: replaceCommon(func(a slog.Attr) slog.Attr {
-			// JSON: mantenha tempo padrão (RFC3339); apenas normaliza nível e mascara segredos.
+			// JSON: keep standard time (RFC3339); only normalize level and mask secrets.
 			return a
 		}),
 	})
@@ -39,7 +39,7 @@ func NewLogger() *Logger {
 		TimeFormat: "01-02-2006 15:04:05.000",
 		NoColor:    false,
 		ReplaceAttr: replaceCommon(func(a slog.Attr) slog.Attr {
-			// tint já formata tempo; apenas nivel colorido já é feito pelo tint.
+			// tint already formats time; only level coloring is already handled by tint.
 			return a
 		}),
 	})
@@ -52,21 +52,21 @@ func NewLogger() *Logger {
 		all:  multi,
 	}
 
-	// se quiser que slog.Default() use ambos:
+	// if set default logger to multi (both)
 	slog.SetDefault(multi)
 
 	return l
 }
 
-// replaceCommon aplica normalizações comuns aos handlers.
+// replaceCommon applies common normalizations to the handlers.
 func replaceCommon(next func(slog.Attr) slog.Attr) func([]string, slog.Attr) slog.Attr {
 	return func(groups []string, a slog.Attr) slog.Attr {
-		// mascarar campos sensíveis
+		// mask sensitive fields
 		switch a.Key {
 		case "password", "secret", "token", "authorization", "api_key":
 			return slog.String(a.Key, "********")
 		}
-		// normalizar nível (inclui CRITICAL)
+		// normalize level (includes CRITICAL)
 		if a.Key == slog.LevelKey {
 			if lvl, ok := a.Value.Any().(slog.Level); ok {
 				switch lvl {
@@ -85,7 +85,7 @@ func replaceCommon(next func(slog.Attr) slog.Attr) func([]string, slog.Attr) slo
 				}
 			}
 		}
-		// delega pro handler específico (texto/json) se quiser mexer mais
+		// delegates to the specific handler (text/json) if further processing is needed
 		return next(a)
 	}
 }
@@ -112,7 +112,7 @@ func buildAttrs(args []any) []any {
 	return attrs
 }
 
-// ---------- APIs públicas ----------
+// ---------- public APIs ----------
 
 func (l *Logger) DebugJSON(msg string, args ...any) { l.json.Debug(msg, buildAttrs(args)...) }
 func (l *Logger) InfoJSON(msg string, args ...any)  { l.json.Info(msg, buildAttrs(args)...) }
@@ -130,7 +130,7 @@ func (l *Logger) CriticalText(msg string, args ...any) {
 	l.text.Log(context.Background(), LevelCritical, msg, buildAttrs(args)...)
 }
 
-// Loga nas duas saídas simultaneamente (multi)
+// Logs to both outputs simultaneously (multi)
 func (l *Logger) Debug(msg string, args ...any) { l.all.Debug(msg, buildAttrs(args)...) }
 func (l *Logger) Info(msg string, args ...any)  { l.all.Info(msg, buildAttrs(args)...) }
 func (l *Logger) Warn(msg string, args ...any)  { l.all.Warn(msg, buildAttrs(args)...) }
@@ -139,7 +139,7 @@ func (l *Logger) Critical(msg string, args ...any) {
 	l.all.Log(context.Background(), LevelCritical, msg, buildAttrs(args)...)
 }
 
-// Com trace-id e span-id (retorna os três loggers encadeados)
+// With trace-id and span-id (returns the three chained loggers)
 type WithTraceLoggers struct {
 	JSON *slog.Logger
 	Text *slog.Logger
@@ -158,12 +158,12 @@ func (l *Logger) WithTrace(ctx context.Context) (*slog.Logger, *slog.Logger, *sl
 	return l.json.With(kvs...), l.text.With(kvs...), l.all.With(kvs...)
 }
 
-// Expor os loggers crus (se precisar)
+// Expose the raw loggers (if needed)
 func (l *Logger) SlogJSON() *slog.Logger { return l.json }
 func (l *Logger) SlogText() *slog.Logger { return l.text }
 func (l *Logger) SlogAll() *slog.Logger  { return l.all }
 
-// Opcional: construir um logger que escreve em writer custom (para tests)
+// Optional: build a logger that writes to a custom writer (for tests)
 func NewForWriter(jsonW, textW io.Writer, level slog.Leveler) *Logger {
 	jsonHandler := slog.NewJSONHandler(jsonW, &slog.HandlerOptions{Level: level, ReplaceAttr: replaceCommon(func(a slog.Attr) slog.Attr { return a })})
 	textHandler := tint.NewHandler(textW, &tint.Options{Level: level, TimeFormat: time.RFC3339})

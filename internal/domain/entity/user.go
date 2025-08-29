@@ -109,6 +109,21 @@ func (u *User) AssignRole(role RoleTypes) *User {
 	return u
 }
 
+func (u *User) AssignCreateAT(createAT time.Time) *User {
+	u.createAT = createAT
+	return u
+}
+
+func (u *User) AssignUpdateAT(updateAT time.Time) *User {
+	u.updateAT = updateAT
+	return u
+}
+
+func (u *User) AssignDeletedAt(deletedAt *time.Time) *User {
+	u.deletedAt = deletedAt
+	return u
+}
+
 func (u *User) ID() int64 {
 	return u.id
 }

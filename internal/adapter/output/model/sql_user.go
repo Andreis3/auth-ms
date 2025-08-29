@@ -42,7 +42,7 @@ func (u *User) ToEntity() entity.User {
 }
 
 func (u *User) ToModel(user entity.User) *User {
-	dateNow := time.Now()
+	dateNow := time.Now().UTC()
 	return &User{
 		PublicID:  util.ToStringPointer(user.PublicID()),
 		Email:     util.ToStringPointer(user.Email()),

@@ -1,5 +1,4 @@
 //go:build unit
-// +build unit
 
 package entity_test
 
@@ -15,7 +14,7 @@ func Test_EntitiesSuite(t *testing.T) {
 
 	suiteConfig.SkipStrings = []string{"SKIPPED", "PENDING", "NEVER-RUN", "SKIP"}
 	reporterConfig.FullTrace = true
-	reporterConfig.Verbose = true
+	reporterConfig.Verbose = false
 
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Entities Suite Tests Context", suiteConfig, reporterConfig)

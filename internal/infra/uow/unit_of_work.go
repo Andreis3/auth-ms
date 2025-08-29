@@ -6,19 +6,19 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/andreis3/customers-ms/internal/domain/errors"
-	"github.com/andreis3/customers-ms/internal/domain/interfaces/adapter"
-	"github.com/andreis3/customers-ms/internal/infra/adapters/db"
+	errors2 "github.com/andreis3/auth-ms/internal/domain/errors"
+	adapter2 "github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
+	"github.com/andreis3/auth-ms/internal/infra/db"
 )
 
 type UnitOfWork struct {
 	DB         *pgxpool.Pool
 	TX         pgx.Tx
-	prometheus adapter.Prometheus
-	tracer     adapter.Tracer
+	prometheus adapter2.Prometheus
+	tracer     adapter2.Tracer
 }
 
-func NewUnitOfWork(db *pgxpool.Pool, prometheus adapter.Prometheus, tracer adapter.Tracer) *UnitOfWork {
+func NewUnitOfWork(db *pgxpool.Pool, prometheus adapter2.Prometheus, tracer adapter2.Tracer) *UnitOfWork {
 	return &UnitOfWork{
 		DB:         db,
 		prometheus: prometheus,
@@ -27,38 +27,40 @@ func NewUnitOfWork(db *pgxpool.Pool, prometheus adapter.Prometheus, tracer adapt
 }
 
 // WithTransaction handles transaction lifecycle safely.
-func (u *UnitOfWork) WithTransaction(ctx context.Context, fn func(ctx context.Context) *errors.Error) *errors.Error {
+func (u *UnitOfWork) WithTransaction(ctx context.Context, fn func(ctx context.Context) *errors2.Error) *errors2.Error {
 	ctx, span := u.tracer.Start(ctx, "UnitOfWork.WithTransaction")
-	defer span.End()
+	defer func() {
+		span.End()
+		u.TX = nil
+	}()
 
 	if u.TX != nil {
-		span.RecordError(errors.ErrorTransactionAlreadyExists())
-		return errors.ErrorTransactionAlreadyExists()
+		span.RecordError(errors2.ErrorTransactionAlreadyExists())
+		return errors2.ErrorTransactionAlreadyExists()
 	}
 
 	tx, err := u.DB.Begin(ctx)
 	if err != nil {
-		span.RecordError(errors.ErrorOpeningTransaction(err))
-		return errors.ErrorOpeningTransaction(err)
+		span.RecordError(errors2.ErrorOpeningTransaction(err))
+		return errors2.ErrorOpeningTransaction(err)
 	}
 
-	defer func() { u.TX = nil }()
 	u.TX = tx
 	ctxTx := db.WithTx(ctx, tx)
 
 	if err := fn(ctxTx); err != nil {
 		rollbackErr := u.TX.Rollback(ctx)
 		if rollbackErr != nil {
-			span.RecordError(errors.ErrorExecuteRollback(rollbackErr))
-			return errors.ErrorExecuteRollback(rollbackErr)
+			span.RecordError(errors2.ErrorExecuteRollback(rollbackErr))
+			return errors2.ErrorExecuteRollback(rollbackErr)
 		}
 		span.RecordError(err)
 		return err
 	}
 
 	if err := u.TX.Commit(ctx); err != nil {
-		span.RecordError(errors.ErrorCommitOrRollback(err))
-		return errors.ErrorCommitOrRollback(err)
+		span.RecordError(errors2.ErrorCommitOrRollback(err))
+		return errors2.ErrorCommitOrRollback(err)
 	}
 
 	return nil

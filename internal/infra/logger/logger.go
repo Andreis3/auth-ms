@@ -153,7 +153,7 @@ func (l *Logger) WithTrace(ctx context.Context) (*slog.Logger, *slog.Logger, *sl
 	}
 	kvs := []any{
 		slog.String("trace_id", spanCtx.TraceID().String()),
-		slog.String("span_id", spanCtx.SpanID().String()),
+		//slog.String("span_id", spanCtx.SpanID().String()),
 	}
 	return l.json.With(kvs...), l.text.With(kvs...), l.all.With(kvs...)
 }

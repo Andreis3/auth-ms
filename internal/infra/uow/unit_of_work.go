@@ -6,18 +6,18 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	errors2 "github.com/andreis3/auth-ms/internal/domain/errors"
-	adapter2 "github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
 	"github.com/andreis3/auth-ms/internal/infra/db"
 )
 
 type UnitOfWork struct {
 	DB         *pgxpool.Pool
-	prometheus adapter2.Prometheus
-	tracer     adapter2.Tracer
+	prometheus adapter.Prometheus
+	tracer     adapter.Tracer
 }
 
-func NewUnitOfWork(db *pgxpool.Pool, prometheus adapter2.Prometheus, tracer adapter2.Tracer) *UnitOfWork {
+func NewUnitOfWork(db *pgxpool.Pool, prometheus adapter.Prometheus, tracer adapter.Tracer) *UnitOfWork {
 	return &UnitOfWork{
 		DB:         db,
 		prometheus: prometheus,
@@ -26,7 +26,7 @@ func NewUnitOfWork(db *pgxpool.Pool, prometheus adapter2.Prometheus, tracer adap
 }
 
 // WithTransaction handles transaction lifecycle safely.
-func (u *UnitOfWork) WithTransaction(ctx context.Context, fn func(ctx context.Context) *errors2.Error) *errors2.Error {
+func (u *UnitOfWork) WithTransaction(ctx context.Context, fn func(ctx context.Context) *errors.Error) *errors.Error {
 	ctx, span := u.tracer.Start(ctx, "UnitOfWork.WithTransaction")
 	defer func() {
 		span.End()
@@ -40,15 +40,15 @@ func (u *UnitOfWork) WithTransaction(ctx context.Context, fn func(ctx context.Co
 
 	if _, ok := db.TxFromContext(ctx); ok {
 		status = "error"
-		span.RecordError(errors2.ErrorTransactionAlreadyExists())
-		return errors2.ErrorTransactionAlreadyExists()
+		span.RecordError(errors.ErrorTransactionAlreadyExists())
+		return errors.ErrorTransactionAlreadyExists()
 	}
 
 	tx, err := u.DB.Begin(ctx)
 	if err != nil {
 		status = "error"
-		span.RecordError(errors2.ErrorOpeningTransaction(err))
-		return errors2.ErrorOpeningTransaction(err)
+		span.RecordError(errors.ErrorOpeningTransaction(err))
+		return errors.ErrorOpeningTransaction(err)
 	}
 
 	ctxTx := db.WithTx(ctx, tx)
@@ -57,8 +57,8 @@ func (u *UnitOfWork) WithTransaction(ctx context.Context, fn func(ctx context.Co
 		status = "error"
 		rollbackErr := tx.Rollback(ctx)
 		if rollbackErr != nil {
-			joinedErr := errors2.Join(err, rollbackErr)
-			rollbackError := errors2.ErrorExecuteRollback(joinedErr)
+			joinedErr := errors.Join(err, rollbackErr)
+			rollbackError := errors.ErrorExecuteRollback(joinedErr)
 			span.RecordError(rollbackError)
 			return rollbackError
 		}
@@ -68,8 +68,8 @@ func (u *UnitOfWork) WithTransaction(ctx context.Context, fn func(ctx context.Co
 
 	if err := tx.Commit(ctx); err != nil {
 		status = "error"
-		span.RecordError(errors2.ErrorCommitOrRollback(err))
-		return errors2.ErrorCommitOrRollback(err)
+		span.RecordError(errors.ErrorCommitOrRollback(err))
+		return errors.ErrorCommitOrRollback(err)
 	}
 
 	return nil

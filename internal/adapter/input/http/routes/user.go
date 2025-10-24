@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	helpers2 "github.com/andreis3/auth-ms/internal/adapter/input/http/helpers"
+	"github.com/andreis3/auth-ms/internal/adapter/input/http/helpers"
 	"github.com/andreis3/auth-ms/internal/adapter/input/http/middlewares"
 	"github.com/andreis3/auth-ms/internal/infra/factory/http/handler"
 )
@@ -23,17 +23,17 @@ func NewUser(
 	}
 }
 
-func (cr *User) Routes() helpers2.RouteType {
+func (cr *User) Routes() helpers.RouteType {
 	prefix := "/auth"
-	return helpers2.WithPrefix(prefix, helpers2.RouteType{
+	return helpers.WithPrefix(prefix, helpers.RouteType{
 		{
 			Method: http.MethodPost,
 			Path:   "/signup",
-			Handler: helpers2.TraceHandler(http.MethodPost, prefix+"/signup", func(w http.ResponseWriter, r *http.Request) {
+			Handler: helpers.TraceHandler(http.MethodPost, prefix+"/signup", func(w http.ResponseWriter, r *http.Request) {
 				cr.CreateAuthUser.NewCreateAuthUser().Handle(w, r)
 			}),
 			Description: "Create Customer",
-			Middlewares: helpers2.Middlewares{
+			Middlewares: helpers.Middlewares{
 				cr.loggingMiddleware.LoggingMiddleware(),
 			},
 		},

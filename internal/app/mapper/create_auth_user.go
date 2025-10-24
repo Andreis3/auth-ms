@@ -14,10 +14,12 @@ func ToUser(input dto.CreateAuthUserInput) entity.User {
 }
 
 func ToCreateAuthUserOutput(user *entity.User) *dto.CreateAuthUserOutput {
+	const layout = "2006-01-02T15:04:05.000000Z"
 	return &dto.CreateAuthUserOutput{
-		ID:       user.ID(),
-		PublicID: user.PublicID(),
-		Name:     user.Name(),
-		Email:    user.Email(),
+		PublicID:  user.PublicID(),
+		Name:      user.Name(),
+		Email:     user.Email(),
+		Role:      user.Role(),
+		CreatedAt: user.CreateAT().Format(layout),
 	}
 }

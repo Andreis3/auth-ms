@@ -8,19 +8,20 @@ import (
 
 	"github.com/andreis3/auth-ms/internal/adapter/output/model"
 	"github.com/andreis3/auth-ms/internal/domain/entity"
-	errors2 "github.com/andreis3/auth-ms/internal/domain/errors"
-	adapter2 "github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
 	"github.com/andreis3/auth-ms/internal/infra/db"
+	"github.com/andreis3/auth-ms/internal/util"
 )
 
 type User struct {
-	DB      adapter2.Postgres
-	metrics adapter2.Prometheus
-	tracer  adapter2.Tracer
+	DB      adapter.Postgres
+	metrics adapter.Prometheus
+	tracer  adapter.Tracer
 	model.User
 }
 
-func NewUserRepository(db adapter2.Postgres, metrics adapter2.Prometheus, tracer adapter2.Tracer) *User {
+func NewUserRepository(db adapter.Postgres, metrics adapter.Prometheus, tracer adapter.Tracer) *User {
 	return &User{
 		DB:      db,
 		metrics: metrics,
@@ -28,7 +29,7 @@ func NewUserRepository(db adapter2.Postgres, metrics adapter2.Prometheus, tracer
 	}
 }
 
-func (u *User) CreateUser(ctx context.Context, user entity.User) (*entity.User, *errors2.Error) {
+func (u *User) CreateUser(ctx context.Context, user entity.User) (*entity.User, *errors.Error) {
 	start := time.Now()
 	ctx, span := u.tracer.Start(ctx, "UserRepository.CreateUser")
 
@@ -60,17 +61,19 @@ func (u *User) CreateUser(ctx context.Context, user entity.User) (*entity.User, 
 
 	if err != nil {
 		var pgErr *pgconn.PgError
-		if errors2.As(err, &pgErr) && pgErr.Code == "23505" {
-			return nil, errors2.ErrorAlreadyExistsUser(err)
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return nil, errors.ErrorAlreadyExistsUser(err)
 		}
-		return nil, errors2.CreateUserError(err)
+		return nil, errors.CreateUserError(err)
 	}
 
 	user.AssignID(id)
+	user.AssignCreateAT(util.ToTime(modelUser.CreatedAt))
+	user.AssignUpdateAT(util.ToTime(modelUser.UpdatedAt))
 	return &user, nil
 }
 
-func (u *User) FindUserByEmail(ctx context.Context, email string) (*entity.User, *errors2.Error) {
+func (u *User) FindUserByEmail(ctx context.Context, email string) (*entity.User, *errors.Error) {
 	ctx, span := u.tracer.Start(ctx, "CustomerRepository.FindCustomerByEmail")
 	start := time.Now()
 
@@ -90,7 +93,7 @@ func (u *User) FindUserByEmail(ctx context.Context, email string) (*entity.User,
 
 	rows, err := db.Query(ctx, query, email)
 	if err != nil {
-		return nil, errors2.ErrorFindUserByEmail(err)
+		return nil, errors.ErrorFindUserByEmail(err)
 	}
 	defer rows.Close()
 
@@ -109,7 +112,7 @@ func (u *User) FindUserByEmail(ctx context.Context, email string) (*entity.User,
 		&model.DeletedAt,
 	)
 	if err != nil {
-		return nil, errors2.ErrorFindUserByEmail(err)
+		return nil, errors.ErrorFindUserByEmail(err)
 	}
 
 	result := model.ToEntity()
@@ -122,7 +125,7 @@ func (u *User) FindUserByEmail(ctx context.Context, email string) (*entity.User,
 	return &result, nil
 }
 
-func (u *User) resolveDB(ctx context.Context) adapter2.Postgres {
+func (u *User) resolveDB(ctx context.Context) adapter.Postgres {
 	if tx, ok := db.TxFromContext(ctx); ok {
 		return tx
 	}

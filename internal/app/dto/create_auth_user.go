@@ -8,8 +8,9 @@ type CreateAuthUserInput struct {
 }
 
 type CreateAuthUserOutput struct {
-	ID       int64  `json:"id"`
-	PublicID string `json:"public_id"`
-	Email    string `json:"email"`
-	Name     string `json:"name"`
+	PublicID  string `json:"public_id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+	CreatedAt string `json:"created_at"`
 }

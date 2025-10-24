@@ -15,8 +15,8 @@ import (
 	"github.com/andreis3/auth-ms/internal/app/dto"
 	"github.com/andreis3/auth-ms/internal/domain/errors"
 	"github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
-	mcommand "github.com/andreis3/auth-ms/tests/mocks/app/mcommand"
-	madapters "github.com/andreis3/auth-ms/tests/mocks/infra/madapters"
+	"github.com/andreis3/auth-ms/tests/mocks/app/mcommand"
+	"github.com/andreis3/auth-ms/tests/mocks/infra/madapters"
 )
 
 var _ = Describe("INTERNAL :: ADAPTER :: INPUT :: HTTP :: HANDLER :: CREATE_AUTH_USER", func() {
@@ -57,7 +57,7 @@ var _ = Describe("INTERNAL :: ADAPTER :: INPUT :: HTTP :: HANDLER :: CREATE_AUTH
 
 			logger.On("InfoJSON", "end request", mock.AnythingOfType("slog.Attr"), mock.AnythingOfType("slog.Attr")).Return()
 
-			output := &dto.CreateAuthUserOutput{ID: 1, PublicID: "user-1", Email: "user@example.com", Name: "User"}
+			output := &dto.CreateAuthUserOutput{PublicID: "user-1", Email: "user@example.com", Name: "User"}
 			commandMock.On("Execute", req.Context(), mock.MatchedBy(func(input dto.CreateAuthUserInput) bool {
 				return input.Email == "user@example.com" && input.Password == "Sup3r$ecret" && input.PasswordConfirm == "Sup3r$ecret" && input.Name == "User"
 			})).Return(output, (*errors.Error)(nil))

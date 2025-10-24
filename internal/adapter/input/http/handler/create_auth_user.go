@@ -34,11 +34,10 @@ func NewCreateAuthUserHandler(
 
 func (h *CreateAuthUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
-	var end time.Duration
 	ctx, span := h.tracer.Start(r.Context(), "CreateAuthUserHandler.Handle")
 	traceID := span.SpanContext().TraceID()
 	defer func() {
-		end = time.Since(start)
+		end := time.Since(start)
 		h.log.InfoJSON(
 			"end request",
 			slog.String("trace_id", traceID),
@@ -52,18 +51,21 @@ func (h *CreateAuthUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		h.log.ErrorJSON("failed decode request body",
 			slog.String("trace_id", traceID),
 			slog.Any("error", err))
-		helpers2.ResponseError(w, err)
-		h.prometheus.ObserveRequestDuration("/auth/signup", "http", http.StatusCreated, "error", float64(end.Milliseconds()))
+		status := helpers2.ResponseError(w, err)
+		duration := time.Since(start)
+		h.prometheus.ObserveRequestDuration("/auth/signup", "http", status, "error", float64(duration.Milliseconds()))
 		return
 	}
 
 	res, err := h.command.Execute(ctx, input)
 	if err != nil {
-		helpers2.ResponseError(w, err)
-		h.prometheus.ObserveRequestDuration("/auth/signup", "http", http.StatusCreated, "error", float64(end.Milliseconds()))
+		status := helpers2.ResponseError(w, err)
+		duration := time.Since(start)
+		h.prometheus.ObserveRequestDuration("/auth/signup", "http", status, "error", float64(duration.Milliseconds()))
 		return
 	}
 
 	helpers2.ResponseSuccess(w, http.StatusCreated, res)
-	h.prometheus.ObserveRequestDuration("/auth/signup", "http", http.StatusCreated, "success", float64(end.Milliseconds()))
+	duration := time.Since(start)
+	h.prometheus.ObserveRequestDuration("/auth/signup", "http", http.StatusCreated, "success", float64(duration.Milliseconds()))
 }

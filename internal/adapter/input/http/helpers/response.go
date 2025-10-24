@@ -36,7 +36,7 @@ func ResponseSuccess[T any](write http.ResponseWriter, status int, data T) {
 	_ = json.NewEncoder(write).Encode(result)
 }
 
-func ResponseError(write http.ResponseWriter, err *errors.Error) {
+func ResponseError(write http.ResponseWriter, err *errors.Error) int {
 	status := translator.ErrorTranslator[err.Code].HTTPStatus
 	write.Header().Set(ContentType, ApplicationJSON)
 	write.WriteHeader(status)
@@ -48,4 +48,5 @@ func ResponseError(write http.ResponseWriter, err *errors.Error) {
 	}
 
 	_ = json.NewEncoder(write).Encode(result)
+	return status
 }

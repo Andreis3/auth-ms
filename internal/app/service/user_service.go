@@ -14,7 +14,7 @@ type UserService struct {
 	log        adapter2.Logger
 }
 
-func NewCustomerService(repository port.UserRepository, trace adapter2.Tracer, log adapter2.Logger) *UserService {
+func NewUserService(repository port.UserRepository, trace adapter2.Tracer, log adapter2.Logger) *UserService {
 	return &UserService{
 		repository: repository,
 		tracer:     trace,

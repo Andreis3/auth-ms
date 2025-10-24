@@ -28,6 +28,6 @@ func MakeUserServiceSut() *UserServiceSut {
 }
 
 func (s *UserServiceSut) Build() *service.UserService {
-	s.Service = service.NewCustomerService(s.Repo, s.Tracer, s.Log)
+	s.Service = service.NewUserService(s.Repo, s.Tracer, s.Log)
 	return s.Service
 }

@@ -1,4 +1,4 @@
-## **1. Microserviço: Customers**
+## **1. Microserviço: Autenticação & Usuários**
 
 **Descrição**: Gerencia autenticação, perfis de usuário e autorização.
 

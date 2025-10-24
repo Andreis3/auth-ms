@@ -7,8 +7,8 @@ import (
 	"github.com/andreis3/auth-ms/internal/app/mapper"
 	"github.com/andreis3/auth-ms/internal/app/port/service"
 	"github.com/andreis3/auth-ms/internal/domain/entity"
-	errors2 "github.com/andreis3/auth-ms/internal/domain/errors"
-	adapter2 "github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
 	"github.com/andreis3/auth-ms/internal/domain/port"
 	"github.com/andreis3/auth-ms/internal/infra/logger"
 )
@@ -16,19 +16,19 @@ import (
 type CreateAuthUser struct {
 	userRepository port.UserRepository
 	userService    service.UserService
-	bcrypt         adapter2.Bcrypt
-	log            adapter2.Logger
-	tracer         adapter2.Tracer
-	utils          adapter2.Utils
+	bcrypt         adapter.Bcrypt
+	log            adapter.Logger
+	tracer         adapter.Tracer
+	utils          adapter.Utils
 }
 
 func NewCreateAuthUser(
 	userRepository port.UserRepository,
 	userService service.UserService,
-	bcrypt adapter2.Bcrypt,
-	log adapter2.Logger,
-	tracer adapter2.Tracer,
-	utils adapter2.Utils,
+	bcrypt adapter.Bcrypt,
+	log adapter.Logger,
+	tracer adapter.Tracer,
+	utils adapter.Utils,
 ) *CreateAuthUser {
 	return &CreateAuthUser{
 		userRepository: userRepository,
@@ -40,14 +40,15 @@ func NewCreateAuthUser(
 	}
 }
 
-func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserInput) (*dto.CreateAuthUserOutput, *errors2.Error) {
+func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserInput) (*dto.CreateAuthUserOutput, *errors.Error) {
 	ctx, span := c.tracer.Start(ctx, "CreateAuthUser.Execute")
 	defer span.End()
 	tracerID := span.SpanContext().TraceID()
 	c.log.InfoJSON("Creating auth user",
 		map[string]any{
 			"trace_id": tracerID,
-			"body":     logger.RedactStruct[dto.CreateAuthUserInput](input, "password", "Password_confirm"),
+			"body": logger.RedactStruct[dto.CreateAuthUserInput](input, "password",
+				"password_confirm"),
 		})
 
 	user := mapper.ToUser(input)
@@ -62,7 +63,7 @@ func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserIn
 				"errors":   isValid.FieldErrorsFlat(),
 			})
 		span.RecordError(isValid)
-		return nil, errors2.InvalidEntity(isValid, "user")
+		return nil, errors.InvalidEntity(isValid, "user")
 	}
 
 	err := c.userService.ValidateEmailAvailability(ctx, input.Email)

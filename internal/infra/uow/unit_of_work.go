@@ -2,8 +2,8 @@ package uow
 
 import (
 	"context"
+	"time"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/andreis3/auth-ms/internal/domain/errors"
@@ -13,7 +13,6 @@ import (
 
 type UnitOfWork struct {
 	DB         *pgxpool.Pool
-	TX         pgx.Tx
 	prometheus adapter.Prometheus
 	tracer     adapter.Tracer
 }
@@ -31,34 +30,44 @@ func (u *UnitOfWork) WithTransaction(ctx context.Context, fn func(ctx context.Co
 	ctx, span := u.tracer.Start(ctx, "UnitOfWork.WithTransaction")
 	defer func() {
 		span.End()
-		u.TX = nil
 	}()
 
-	if u.TX != nil {
+	start := time.Now()
+	status := "success"
+	defer func() {
+		u.prometheus.ObserveInstructionDBDuration("postgres", "transaction", "with_transaction_"+status, float64(time.Since(start).Milliseconds()))
+	}()
+
+	if _, ok := db.TxFromContext(ctx); ok {
+		status = "error"
 		span.RecordError(errors.ErrorTransactionAlreadyExists())
 		return errors.ErrorTransactionAlreadyExists()
 	}
 
 	tx, err := u.DB.Begin(ctx)
 	if err != nil {
+		status = "error"
 		span.RecordError(errors.ErrorOpeningTransaction(err))
 		return errors.ErrorOpeningTransaction(err)
 	}
 
-	u.TX = tx
 	ctxTx := db.WithTx(ctx, tx)
 
 	if err := fn(ctxTx); err != nil {
-		rollbackErr := u.TX.Rollback(ctx)
+		status = "error"
+		rollbackErr := tx.Rollback(ctx)
 		if rollbackErr != nil {
-			span.RecordError(errors.ErrorExecuteRollback(rollbackErr))
-			return errors.ErrorExecuteRollback(rollbackErr)
+			joinedErr := errors.Join(err, rollbackErr)
+			rollbackError := errors.ErrorExecuteRollback(joinedErr)
+			span.RecordError(rollbackError)
+			return rollbackError
 		}
 		span.RecordError(err)
 		return err
 	}
 
-	if err := u.TX.Commit(ctx); err != nil {
+	if err := tx.Commit(ctx); err != nil {
+		status = "error"
 		span.RecordError(errors.ErrorCommitOrRollback(err))
 		return errors.ErrorCommitOrRollback(err)
 	}

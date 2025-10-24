@@ -1,11 +1,13 @@
-<h1 align="center">E-commerce Customers Service</h1>
+<h1 align="center">E-commerce Authentication & Users Service</h1>
+
+<p align="center"><em>Microserviço responsável por autenticação, gestão de perfis de usuário e autorização.</em></p>
 
 <p align="center">
-	<img src="docs/images/golang.jpg" width="150" height="150"/>
-	<img src="docs/images/postgres.jpg" width="150" height="150"/>
-	<img src="docs/images/redis.png" width="170" height="150"/>
-	<img src="docs/images/prometheus.png" width="170" height="150">
-	<img src="docs/images/grafana.png" width="170" height="150">
+        <img src="docs/images/golang.jpg" width="150" height="150"/>
+        <img src="docs/images/postgres.jpg" width="150" height="150"/>
+        <img src="docs/images/redis.png" width="170" height="150"/>
+        <img src="docs/images/prometheus.png" width="170" height="150">
+        <img src="docs/images/grafana.png" width="170" height="150">
 </p>
 
 ## Step 2: Install Dependencies

@@ -39,7 +39,7 @@ func newCreateAuthUser(
 	metrics adapter2.Prometheus,
 ) *command.CreateAuthUser {
 	userRepository := repository.NewUserRepository(db, metrics, tracer)
-	userService := service.NewCustomerService(userRepository, tracer, log)
+	userService := service.NewUserService(userRepository, tracer, log)
 	utils := shared.Utils{}
 	return command.NewCreateAuthUser(
 		userRepository,

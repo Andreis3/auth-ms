@@ -43,10 +43,10 @@ func NewCreateAuthUser(
 func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserInput) (*dto.CreateAuthUserOutput, *errors2.Error) {
 	ctx, span := c.tracer.Start(ctx, "CreateAuthUser.Execute")
 	defer span.End()
-	tracerID := span.SpanContext().TraceID()
+	traceID := span.SpanContext().TraceID()
 	c.log.InfoJSON("Creating auth user",
 		map[string]any{
-			"trace_id": tracerID,
+			"trace_id": traceID,
 			"body": logger.RedactStruct[dto.CreateAuthUserInput](input, "password",
 				"password_confirm"),
 		})
@@ -57,20 +57,23 @@ func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserIn
 	isValid := user.Validate()
 
 	if isValid.HasErrors() {
+		validationErr := errors2.InvalidEntity(isValid, "user")
+
 		c.log.CriticalJSON("User validation failed",
 			map[string]any{
-				"trace_id": tracerID,
+				"trace_id": traceID,
 				"errors":   isValid.FieldErrorsFlat(),
 			})
-		span.RecordError(isValid)
-		return nil, errors2.InvalidEntity(isValid, "user")
+		span.RecordError(validationErr)
+		return nil, validationErr
 	}
 
 	err := c.userService.ValidateEmailAvailability(ctx, input.Email)
 	if err != nil {
+		span.RecordError(err)
 		c.log.ErrorJSON("Email validation failed",
 			map[string]any{
-				"trace_id": tracerID,
+				"trace_id": traceID,
 				"email":    input.Email,
 				"error":    err.Error(),
 			})
@@ -79,10 +82,12 @@ func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserIn
 
 	hashedPassword, err := c.bcrypt.Hash(user.Password())
 	if err != nil {
+		span.RecordError(err)
 		c.log.CriticalJSON(
 			"Error hashing password",
 			map[string]any{
-				"error": err.Error(),
+				"trace_id": traceID,
+				"error":    err.Error(),
 			})
 		return nil, err
 	}
@@ -90,10 +95,12 @@ func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserIn
 
 	createUser, err := c.userRepository.CreateUser(ctx, user)
 	if err != nil {
+		span.RecordError(err)
 		c.log.ErrorJSON(
 			"Error creating user",
 			map[string]any{
-				"error": err.Error(),
+				"trace_id": traceID,
+				"error":    err.Error(),
 			})
 		return nil, err
 	}

@@ -43,17 +43,42 @@ var _ = Describe("INTERNAL :: DOMAIN :: ENTITY :: USER", func() {
 		})
 
 		Context("error cases", func() {
-			It("should return an error when user is empty", func() {
+			var (
+				validationErr  *validator.Validator
+				expectedErrors []string
+			)
+
+			BeforeEach(func() {
 				user := entity.BuilderUser().Build()
 
-				err := user.Validate()
-				Expect(err.Errors()).NotTo(BeNil())
-				Expect(err.Errors()).To(HaveLen(11))
-				Expect(err.Errors()).To(ContainElement(fmt.Sprintf("public_id: %s", validator.ErrNotBlank)))
-				Expect(err.Errors()).To(ContainElement(fmt.Sprintf("email: %s", validator.ErrNotBlank)))
-				Expect(err.Errors()).To(ContainElement(fmt.Sprintf("password: %s", validator.ErrNotBlank)))
-				Expect(err.Errors()).To(ContainElement(fmt.Sprintf("name: %s", validator.ErrNotBlank)))
-				Expect(err.Errors()).To(ContainElement(fmt.Sprintf("role: %s", validator.ErrNotBlank)))
+				validationErr = user.Validate()
+				expectedErrors = []string{
+					fmt.Sprintf("email: %s", validator.ErrNotBlank),
+					"email: invalid email format",
+					fmt.Sprintf("name: %s", validator.ErrNotBlank),
+					fmt.Sprintf("password: %s", validator.ErrNotBlank),
+					"password: must be at least 8 characters",
+					"password: must contain at least one uppercase letter",
+					"password: must contain at least one lowercase letter",
+					"password: must contain at least one number",
+					"password: must contain at least one special character",
+					fmt.Sprintf("public_id: %s", validator.ErrNotBlank),
+					fmt.Sprintf("role: %s", validator.ErrNotBlank),
+				}
+			})
+
+			It("should return all expected validation errors when user is empty", func() {
+				errs := validationErr.Errors()
+
+				Expect(errs).NotTo(BeNil())
+				Expect(errs).To(HaveLen(len(expectedErrors)))
+				for _, expected := range expectedErrors {
+					Expect(errs).To(ContainElement(expected))
+				}
+			})
+
+			It("should not include unexpected validation errors when user is empty", func() {
+				Expect(validationErr.Errors()).To(Equal(expectedErrors))
 			})
 		})
 	})

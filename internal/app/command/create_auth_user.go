@@ -48,7 +48,7 @@ func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserIn
 		map[string]any{
 			"trace_id": tracerID,
 			"body": logger.RedactStruct[dto.CreateAuthUserInput](input, "password",
-				"Password_confirm"),
+				"password_confirm"),
 		})
 
 	user := mapper.ToUser(input)

@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 
-	errors2 "github.com/andreis3/auth-ms/internal/domain/errors"
+	"github.com/andreis3/auth-ms/internal/domain/errors"
 )
 
 type ProtocolError struct {
@@ -13,32 +13,32 @@ type ProtocolError struct {
 	GRPCCode   codes.Code
 }
 
-var ErrorTranslator = map[errors2.Code]ProtocolError{
-	errors2.ErrBadRequest: {
+var ErrorTranslator = map[errors.Code]ProtocolError{
+	errors.ErrBadRequest: {
 		HTTPStatus: http.StatusBadRequest,
 		GRPCCode:   codes.InvalidArgument,
 	},
-	errors2.ErrNotFound: {
+	errors.ErrNotFound: {
 		HTTPStatus: http.StatusNotFound,
 		GRPCCode:   codes.NotFound,
 	},
-	errors2.ErrInternal: {
+	errors.ErrInternal: {
 		HTTPStatus: http.StatusInternalServerError,
 		GRPCCode:   codes.Internal,
 	},
-	errors2.ErrUnauthorized: {
+	errors.ErrUnauthorized: {
 		HTTPStatus: http.StatusUnauthorized,
 		GRPCCode:   codes.Unauthenticated,
 	},
-	errors2.ErrForbidden: {
+	errors.ErrForbidden: {
 		HTTPStatus: http.StatusForbidden,
 		GRPCCode:   codes.PermissionDenied,
 	},
-	errors2.ErrConflict: {
+	errors.ErrConflict: {
 		HTTPStatus: http.StatusConflict,
 		GRPCCode:   codes.AlreadyExists,
 	},
-	errors2.ErrUnprocessableEntity: {
+	errors.ErrUnprocessableEntity: {
 		HTTPStatus: http.StatusUnprocessableEntity,
 		GRPCCode:   codes.InvalidArgument,
 	},

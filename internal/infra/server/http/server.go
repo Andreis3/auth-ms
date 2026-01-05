@@ -15,30 +15,30 @@ import (
 
 	"github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
 	"github.com/andreis3/auth-ms/internal/infra/config"
-	db2 "github.com/andreis3/auth-ms/internal/infra/db"
+	"github.com/andreis3/auth-ms/internal/infra/db"
 	"github.com/andreis3/auth-ms/internal/infra/logger"
-	observability2 "github.com/andreis3/auth-ms/internal/infra/observability"
+	"github.com/andreis3/auth-ms/internal/infra/observability"
 	"github.com/andreis3/auth-ms/internal/infra/server/http/routes"
 	"github.com/andreis3/auth-ms/internal/util"
 )
 
 type Server struct {
 	HTTPServer *http.Server
-	Postgres   *db2.Postgres
+	Postgres   *db.Postgres
 	Log        logger.Logger
-	Prometheus *observability2.Prometheus
+	Prometheus *observability.Prometheus
 	Tracer     adapter.Tracer
 }
 
 func NewServer(conf *config.Configs, log logger.Logger) *Server {
 	start := time.Now()
 
-	prometheus := observability2.NewPrometheus()
-	pool := db2.NewPoolConnections(conf, prometheus)
+	prometheus := observability.NewPrometheus()
+	pool := db.NewPoolConnections(conf, prometheus)
 
-	redis := db2.NewRedis(*conf)
+	redis := db.NewRedis(*conf)
 
-	tracer, _ := observability2.InitOtelTracer(context.Background(), "customers-ms")
+	tracer, _ := observability.InitOtelTracer(context.Background(), "customers-ms")
 
 	mux := chi.NewRouter()
 

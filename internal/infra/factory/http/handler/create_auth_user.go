@@ -6,22 +6,22 @@ import (
 	"github.com/andreis3/auth-ms/internal/adapter/output/security"
 	"github.com/andreis3/auth-ms/internal/app/command"
 	"github.com/andreis3/auth-ms/internal/app/service"
-	adapter2 "github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
+	"github.com/andreis3/auth-ms/internal/domain/interfaces/adapter"
 	"github.com/andreis3/auth-ms/internal/infra/config"
-	db2 "github.com/andreis3/auth-ms/internal/infra/db"
+	"github.com/andreis3/auth-ms/internal/infra/db"
 	"github.com/andreis3/auth-ms/internal/infra/shared"
 )
 
 type CreateAuthUser struct {
-	db      *db2.Postgres
-	redis   *db2.Redis
-	log     adapter2.Logger
-	metrics adapter2.Prometheus
-	tracer  adapter2.Tracer
+	db      *db.Postgres
+	redis   *db.Redis
+	log     adapter.Logger
+	metrics adapter.Prometheus
+	tracer  adapter.Tracer
 	conf    *config.Configs
 }
 
-func NewCreateAuthUser(database *db2.Postgres, redis *db2.Redis, log adapter2.Logger, metrics adapter2.Prometheus, tracer adapter2.Tracer, conf *config.Configs) *CreateAuthUser {
+func NewCreateAuthUser(database *db.Postgres, redis *db.Redis, log adapter.Logger, metrics adapter.Prometheus, tracer adapter.Tracer, conf *config.Configs) *CreateAuthUser {
 	return &CreateAuthUser{database, redis, log, metrics, tracer, conf}
 }
 
@@ -32,11 +32,11 @@ func (f *CreateAuthUser) NewCreateAuthUser() *handler.CreateAuthUserHandler {
 }
 
 func newCreateAuthUser(
-	db *db2.Postgres,
-	crypto adapter2.Bcrypt,
-	log adapter2.Logger,
-	tracer adapter2.Tracer,
-	metrics adapter2.Prometheus,
+	db *db.Postgres,
+	crypto adapter.Bcrypt,
+	log adapter.Logger,
+	tracer adapter.Tracer,
+	metrics adapter.Prometheus,
 ) *command.CreateAuthUser {
 	userRepository := repository.NewUserRepository(db, metrics, tracer)
 	userService := service.NewUserService(userRepository, tracer, log)

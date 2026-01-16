@@ -47,7 +47,7 @@ func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserIn
 	c.log.InfoJSON("Creating auth user",
 		map[string]any{
 			"trace_id": traceID,
-			"body": logger.RedactStruct[dto.CreateAuthUserInput](input, "password",
+			"body": logger.RedactStruct(input, "password",
 				"password_confirm"),
 		})
 
@@ -80,6 +80,18 @@ func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserIn
 		return nil, err
 	}
 
+	if input.Password != input.PasswordConfirm {
+		passwordErr := errors.ErrorPasswordsDoNotMatch()
+
+		span.RecordError(passwordErr)
+		c.log.ErrorJSON("Password confirmation failed",
+			map[string]any{
+				"trace_id": traceID,
+				"email":    input.Email,
+			})
+		return nil, passwordErr
+	}
+
 	hashedPassword, err := c.bcrypt.Hash(user.Password())
 	if err != nil {
 		span.RecordError(err)
@@ -106,5 +118,4 @@ func (c *CreateAuthUser) Execute(ctx context.Context, input dto.CreateAuthUserIn
 	}
 
 	return mapper.ToCreateAuthUserOutput(createUser), nil
-
 }

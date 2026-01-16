@@ -38,7 +38,23 @@ func NewServer(conf *config.Configs, log logger.Logger) *Server {
 
 	redis := db.NewRedis(*conf)
 
-	tracer, _ := observability.InitOtelTracer(context.Background(), "customers-ms")
+	otelConfig := observability.OtelConfig{
+		ServiceName:     conf.ApplicationName,
+		HostTracer:      conf.HostTracer,
+		Insecure:        conf.Insecure,
+		SampleRatio:     conf.SampleRatio,
+		SetGlobal:       conf.SetGlobal,
+		CompressionGzip: conf.CompressionGzip,
+		ShutdownTimeout: conf.ShutdownTimeout,
+		ServiceVersion:  conf.ServiceVersion,
+		Environment:     conf.Env,
+	}
+
+	tracer, _, err := observability.InitializeOtelTracer(context.Background(), otelConfig)
+	if err != nil {
+		log.CriticalText("[Server] ", "OTEL_TRACER_INIT_ERROR", err.Error())
+		os.Exit(util.ExitFailure)
+	}
 
 	mux := chi.NewRouter()
 

@@ -26,6 +26,14 @@ type Configs struct {
 	JWTSecret               string        `mapstructure:"JWT_SECRET"`                  // JWT secret
 	JWTExpiry               time.Duration `mapstructure:"JWT_EXPIRY"`                  // JWT expiry
 	Env                     string        `mapstructure:"ENV"`                         // Environment
+	ServiceVersion          string        `mapstructure:"SERVICE_VERSION"`             // Service ServiceVersion
+	ServviceName            string        `mapstructure:"SERVICE_NAME"`                // Service ServviceName
+	Insecure                bool          `mapstructure:"INSECURE"`                    // Insecure connection
+	HostTracer              string        `mapstructure:"HOST_TRACER"`                 // Host Tracer
+	CompressionGzip         bool          `mapstructure:"COMPRESSION_GZIP"`            // Compression Gzip
+	SampleRatio             float64       `mapstructure:"SAMPLE_RATIO"`                // Sample Ratio
+	ShutdownTimeout         time.Duration `mapstructure:"SHUTDOWN_TIMEOUT"`            // Shutdown Timeout
+	SetGlobal               bool          `mapstructure:"SET_GLOBAL"`                  // Set Global
 }
 
 // LoadConfig loads the application configuration from either a .env file or environment variables.

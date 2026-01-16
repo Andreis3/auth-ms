@@ -41,7 +41,7 @@ func deepRedact(rv reflect.Value, full map[string]struct{}, names map[string]str
 		return rv
 	}
 	// desreferencia ponteiros/interfaces
-	for rv.Kind() == reflect.Pointer || rv.Kind() == reflect.Interface {
+	if rv.Kind() == reflect.Pointer || rv.Kind() == reflect.Interface {
 		if rv.IsNil() {
 			return rv
 		}
@@ -60,7 +60,7 @@ func deepRedact(rv reflect.Value, full map[string]struct{}, names map[string]str
 	case reflect.Struct:
 		out := reflect.New(rv.Type()).Elem()
 		rt := rv.Type()
-		for i := 0; i < rv.NumField(); i++ {
+		for i := range rv.NumField() {
 			fv := rv.Field(i)
 			ft := rt.Field(i)
 			// ignora campos não exportados
@@ -125,7 +125,7 @@ func deepRedact(rv reflect.Value, full map[string]struct{}, names map[string]str
 	case reflect.Slice, reflect.Array:
 		n := rv.Len()
 		out := reflect.MakeSlice(rv.Type(), n, n)
-		for i := 0; i < n; i++ {
+		for i := range n {
 			idxPath := prefix + "." + itoa(i)
 			out.Index(i).Set(deepRedact(rv.Index(i), full, names, idxPath))
 		}
